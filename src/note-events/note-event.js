@@ -20,7 +20,8 @@ class NoteEvent {
 		this.channel 	= fields.channel || 1;
 		this.repeat 	= fields.repeat || 1;
 		this.grace		= fields.grace;
-		this.startTick	= fields.startTick || null;
+		this.startTick	= (typeof fields.startTick !== 'undefined')
+                           ? fields.startTick : null;
 		this.tickDuration = Utils.getTickDuration(this.duration);
 		this.restDuration = Utils.getTickDuration(this.wait);
 
