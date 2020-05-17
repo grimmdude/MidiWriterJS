@@ -10,8 +10,8 @@ class NoteOffEvent {
 		// Set default fields
 		fields = Object.assign({
 			channel: 1,
-			noteOnTick: null,
 			velocity: 50,
+			tick: null,
 		}, fields);
 
 		this.type 		= 'note-off';
@@ -19,10 +19,9 @@ class NoteOffEvent {
 		this.pitch 		= fields.pitch;
 		this.duration 	= fields.duration;
 		this.velocity 	= fields.velocity;
-		this.noteOnTick = fields.noteOnTick;
 
 		this.midiNumber = Utils.getPitch(this.pitch);
-		this.tick 		= null;
+		this.tick 		= fields.tick;
 		this.delta 		= Utils.getTickDuration(this.duration);
 		this.data 		= fields.data;
 	}
@@ -33,10 +32,7 @@ class NoteOffEvent {
 	 * @return {NoteOffEvent}
 	 */
 	buildData(track) {
-		if (this.noteOnTick) {
-			this.tick = this.noteOnTick + Utils.getTickDuration(this.duration);
-
-		} else {
+		if (this.tick === null) {
 			this.tick = this.delta + track.tickPointer;
 		}
 

@@ -14,12 +14,12 @@ track.addEvent([
 				startTick: 50
 			}),
 			new MidiWriter.NoteEvent({
-				pitch: 'G4',
+				pitch: ['G4', 'B4'],
 				duration: 'T50',
 				startTick: 100
 			}),
 			new MidiWriter.NoteEvent({
-				pitch: 'B4',
+				pitch: 'C5',
 				duration: 'T50',
 				startTick: 150
 			}),

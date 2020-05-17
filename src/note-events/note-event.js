@@ -105,7 +105,7 @@ class NoteEvent {
 							duration: this.duration,
 							velocity: this.velocity,
 							pitch: p,
-							noteOnTick: this.startTick,
+							tick: this.startTick !== null ? Utils.getTickDuration(this.duration) - this.startTick : null,
 						});
 
 					} else {
@@ -116,7 +116,7 @@ class NoteEvent {
 							duration: 0,
 							velocity: this.velocity,
 							pitch: p,
-							noteOnTick: this.startTick,
+							tick: this.startTick !== null ? Utils.getTickDuration(this.duration) - this.startTick : null,
 						});
 					}
 
@@ -153,7 +153,6 @@ class NoteEvent {
 						duration: this.duration,
 						velocity: this.velocity,
 						pitch: p,
-						noteOnTick: this.startTick,
 					});
 
 					this.events.push(noteOnNew, noteOffNew);

@@ -7,7 +7,9 @@ import {InstrumentNameEvent} from './meta-events/instrument-name-event';
 import {KeySignatureEvent} from './meta-events/key-signature-event';
 import {LyricEvent} from './meta-events/lyric-event';
 import {MarkerEvent} from './meta-events/marker-event';
+import {NoteEvent} from './note-events/note-event';
 import {NoteOnEvent} from './note-events/note-on-event';
+import {NoteOffEvent} from './note-events/note-off-event';
 import {PitchBendEvent} from './meta-events/pitch-bend-event';
 import {TempoEvent} from './meta-events/tempo-event';
 import {TextEvent} from './meta-events/text-event';
@@ -43,7 +45,7 @@ class Track {
 	 */
 	addEvent(events, mapFunction) {
 		Utils.toArray(events).forEach((event, i) => {
-			if (event.type === 'note') {
+			if (event instanceof NoteEvent) {
 				// Handle map function if provided
 				if (typeof mapFunction === 'function') {
 					const properties = mapFunction(i, event);
@@ -101,7 +103,7 @@ class Track {
 
 		this.events.forEach((event, eventIndex) => {
 			// Build event & add to total tick duration
-			if (event.type === 'note-on' || event.type === 'note-off') {
+			if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
 				this.data = this.data.concat(event.buildData(this).data);
 				this.tickPointer = event.tick;
 

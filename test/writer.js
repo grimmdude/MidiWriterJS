@@ -44,7 +44,7 @@ describe('MidiWriterJS', function() {
 		describe('#Notes by Start Tick', function() {
 			it('should return specific base64 string when notes by start tick example is created.', function () {
 				const hcb = require('../examples/notes-by-start-tick.js');
-				assert.equal('data:audio/midi;base64,TVRoZAAAAAYAAAABAIBNVHJrAAAAPACQPEAygDxAAJBAQDKAQEAAkENAMoBDQACQR0AygEdAAJBKQDKASkAAkE1AMoBNQACQUUAygFFAAP8vAA==', hcb);
+				assert.equal('data:audio/midi;base64,TVRoZAAAAAYAAAABAIBNVHJrAAAARACAUUAygE1AMoBKQDKASEAygENAAIBHQACQPEAAgEBAMoA8QACQQEAykENAAJBHQDKQSEAykEpAMpBNQDKQUUAA/y8A', hcb);
 			});
 		});
 
