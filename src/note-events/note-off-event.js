@@ -31,12 +31,14 @@ class NoteOffEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOffEvent}
 	 */
-	buildData(track) {
+	buildData(track, precisionDelta) {
 		if (this.tick === null) {
-			this.tick = this.delta + track.tickPointer;
+			this.tick = Utils.getRoundedIfClose(this.delta + track.tickPointer);
 		}
 
-		this.data = Utils.numberToVariableLength(this.delta)
+		this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
+
+		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
 							this.getStatusByte(),
 							this.midiNumber,

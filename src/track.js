@@ -101,12 +101,15 @@ class Track {
 		this.size = [];
 		this.tickPointer = 0;
 
+		let precisionLoss = 0;
+
 		this.events.forEach((event, eventIndex) => {
 			// Build event & add to total tick duration
 			if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
-				this.data = this.data.concat(event.buildData(this).data);
-				this.tickPointer = event.tick;
-
+				const built = event.buildData(this, precisionLoss);
+				precisionLoss = Utils.getPrecisionLoss(event.deltaWithPrecisionCorrection || 0);
+				this.data = this.data.concat(built.data);
+				this.tickPointer = Utils.getRoundedIfClose(event.tick);
 			} else {
 				this.data = this.data.concat(event.data);
 			}

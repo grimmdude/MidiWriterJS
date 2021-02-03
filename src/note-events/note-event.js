@@ -133,13 +133,6 @@ class NoteEvent {
 						restDuration = 0;
 					}
 
-					// If duration is 8th triplets we need to make sure that the total ticks == quarter note.
-					// So, the last one will need to be the remainder
-					if (this.duration === '8t' && i == this.pitch.length - 1) {
-						let quarterTicks = Utils.numberFromBytes(Constants.HEADER_CHUNK_DIVISION);
-						tickDuration = quarterTicks - (tickDuration * 2);
-					}
-
 					var noteOnNew = new NoteOnEvent({
 						channel: this.channel,
 						wait: (i > 0 ? 0 : this.wait), // wait only applies to first note in repetition

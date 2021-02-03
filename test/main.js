@@ -108,6 +108,112 @@ describe('MidiWriterJS', function() {
 			const write = new MidiWriter.Writer(track);
 			assert.equal('TVRoZAAAAAYAAAABAIBNVHJrAAAACACwAX8A/y8A', write.base64());
 		});
+
+		it('should create 3 triplet eights followed by a quarter - on correct ticks', function() {
+			const track = new MidiWriter.Track();
+			track.addEvent([
+				new MidiWriter.NoteEvent({pitch: ['D5', 'C5', 'B4'], duration: '8t', sequential: true}),
+				new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd2'}),
+			])
+			const builtTrack = track.buildData();
+			assert.equal(builtTrack.events[6].tick, 128)
+			assert.equal(builtTrack.events[7].tick, 512)
+		})
+
+		it('should create 3 triplet eights followed by a whole, after normal 6 eights - on correct ticks', function() {
+			const track = new MidiWriter.Track();
+			track.addEvent([
+				new MidiWriter.NoteEvent({pitch: ['G4', 'Gb4', 'C4', 'B3', 'Eb4', 'Gb4'], duration: '8', sequential:true}),
+				new MidiWriter.NoteEvent({pitch: ['D5', 'C5', 'B4'], duration: '8t', sequential: true}),
+				new MidiWriter.NoteEvent({pitch: ['B#4'], duration: '1'}),
+			])
+			const builtTrack = track.buildData();
+			const lastEvents = [...builtTrack.events].reverse();
+			// 2nd bar:
+			assert.equal(lastEvents[2].tick, 128 * 4);
+			// 3rd bar:
+			assert.equal(lastEvents[1].tick, 128 * 8);
+		})
+
+		it('should write 14 bars where certain notes should start exactly at the beginning of each bar', function() {
+			const track = new MidiWriter.Track();
+			track
+				.setTempo(60)
+				.addEvent([
+					new MidiWriter.ProgramChangeEvent({instrument : 1}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['C5'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['C5'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['C5'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['Bb4'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd8'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: '16'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['Ab4'], duration: '2'}),
+					new MidiWriter.NoteEvent({pitch: ['A4', 'B4', 'D5', 'C5', 'E4', 'A4'], duration: '8', sequential:true}),
+					new MidiWriter.NoteEvent({pitch: ['Gb4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['Gb4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['A4'], duration: '4'}),
+					new MidiWriter.NoteEvent({pitch: ['G1', 'Gb4', 'C4', 'B3', 'Eb4', 'Gb4'], duration: '8', sequential: true}),
+					new MidiWriter.NoteEvent({pitch: ['D5', 'C5', 'B5'], duration: '8t', sequential: true}),
+					// 4x quintuplets
+					new MidiWriter.NoteEvent({pitch: ['B1', 'A4', 'A4', 'A4', 'A4'], duration: '8t5', sequential: true}),
+					new MidiWriter.NoteEvent({pitch: ['A4', 'A4', 'A4', 'A4', 'A4'], duration: '8t5', sequential: true}),
+					new MidiWriter.NoteEvent({pitch: ['A4', 'A4', 'A4', 'A4', 'A4'], duration: '8t5', sequential: true}),
+					new MidiWriter.NoteEvent({pitch: ['A4', 'A4', 'A4', 'A4', 'A4'], duration: '8t5', sequential: true}),
+					new MidiWriter.NoteEvent({pitch: ['F1'], duration: '1'}),
+				]);
+
+			const builtTrack = track.buildData();
+			const twelvethBarEvent = builtTrack.events.find((event) => event.pitch === 'G1')
+			const thirteenthBarEvent = builtTrack.events.find((event) => event.pitch === 'B1');
+			const fourteenthBarEvent = builtTrack.events.find((event) => event.pitch === 'F1');
+			// 12th bar:
+			assert.equal(twelvethBarEvent.tick, 512 * 11);
+			// 13th bar:
+			assert.equal(thirteenthBarEvent.tick, 512 * 12);
+			// 14th bar:
+			assert.equal(fourteenthBarEvent.tick, 512 * 13);
+			// console.log(builtTrack.events)
+		})
+
+		it('3 triplets and 1 dotted is the duration as one whole - next bar starts in the correct place', function() {
+			const track = new MidiWriter.Track();
+
+			track
+				.addEvent([
+					new MidiWriter.ProgramChangeEvent({instrument : 1}),
+					new MidiWriter.NoteEvent({pitch: ['D5', 'G5', 'B4'], duration: '8t', sequential: true}),
+					new MidiWriter.NoteEvent({pitch: ['B4'], duration: 'd2'}),
+					new MidiWriter.NoteEvent({pitch: ['C5'], duration: '4'}),
+				]);
+
+			const builtTrack = track.buildData();
+			const bar2note = builtTrack.events.find((event) => event.pitch === 'C5');
+
+			const track2 = new MidiWriter.Track();
+
+			track2
+				.addEvent([
+					new MidiWriter.ProgramChangeEvent({instrument : 1}),
+					new MidiWriter.NoteEvent({pitch: ['D5'], duration: '1'}),
+					new MidiWriter.NoteEvent({pitch: ['C5'], duration: '4'}),
+				]);
+
+			const builtTrack2 = track2.buildData();
+			const bar2note2 = builtTrack2.events.find((event) => event.pitch === 'C5');
+
+			assert.equal(JSON.stringify(bar2note, null, 2), JSON.stringify(bar2note2, null, 2));
+		})
 	});
 
 	describe('#Utils()', function() {
@@ -149,7 +255,7 @@ describe('MidiWriterJS', function() {
 
 		describe('#numberToBytes()', function () {
 			it('should return [0, 5] when converting the number 5 into two bytes.', function() {
-				assert.equal([0, 5].toString(), MidiWriter.Utils.numberToBytes(5,2));
+				assert.equal([0, 5].toString(), MidiWriter.Utils.numberToBytes(5, 2));
 			});
 		});
 
@@ -160,56 +266,16 @@ describe('MidiWriterJS', function() {
 			});
 		});
 
+		describe('#getTickDuration()', function () {
+			it('should return 128 for a quarter note.', function () {
+				const note = new MidiWriter.NoteEvent({pitch: 'C4', duration: '4'});
+				assert.equal(MidiWriter.Utils.getTickDuration(note.duration), 128);
+			});
+			it('should return 128 for 3 triplet eights.', function () {
+				const note = new MidiWriter.NoteEvent({pitch: 'C4', duration: ['8t', '8t', '8t']});
+				assert.equal(MidiWriter.Utils.getTickDuration(note.duration), 128);
+			});
+		});
+
 	});
-
-	describe('#VexFlow()', function () {
-		it('should instantiate', function() {
-			const v = new MidiWriter.VexFlow();
-			assert.notEqual(typeof v, 'undefined');
-			assert.equal(v instanceof MidiWriter.VexFlow, true);
-		});
-
-		it('should trackFromVoice', function() {
-			const v = new MidiWriter.VexFlow();
-			const mockVoice = {
-				tickables: []
-			}
-			const track = v.trackFromVoice(mockVoice);
-			assert.notEqual(typeof track, 'undefined');
-			assert.equal(track instanceof MidiWriter.Track, true);
-		});
-
-		it('should convertPitch', function() {
-			const v = new MidiWriter.VexFlow();
-			let p = 'pit/ch';
-			p = v.convertPitch(p);
-			assert.equal(p, 'pitch');
-		});
-
-		it('should convertDuration', function () {
-			const v = new MidiWriter.VexFlow();
-			const mockNote = {
-				duration: 'w',
-				isDotted: () => true,
-			}
-			assert.equal(v.convertDuration(mockNote), '1');
-			mockNote.duration = 'h';
-			assert.equal(v.convertDuration(mockNote), 'd2');
-			mockNote.duration = 'q';
-			assert.equal(v.convertDuration(mockNote), 'd4');
-			mockNote.duration = '8';
-			assert.equal(v.convertDuration(mockNote), 'd8');
-			mockNote.isDotted = () => false;
-			mockNote.duration = 'h';
-			assert.equal(v.convertDuration(mockNote), '2');
-			mockNote.duration = 'q';
-			assert.equal(v.convertDuration(mockNote), '4');
-			mockNote.duration = '8';
-			assert.equal(v.convertDuration(mockNote), '8');
-
-			mockNote.duration = 'some stuff'
-			assert.equal(v.convertDuration(mockNote), 'some stuff');
-		})
-	})
-
 });

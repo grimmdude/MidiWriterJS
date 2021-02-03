@@ -33,12 +33,12 @@ class NoteOnEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOnEvent}
 	 */
-	buildData(track) {
+	buildData(track, precisionDelta) {
 		this.data = [];
 
 		// Explicitly defined startTick event
 		if (this.startTick) {
-			this.tick = this.startTick;
+			this.tick = Utils.getRoundedIfClose(this.startTick);
 
 			// If this is the first event in the track then use event's starting tick as delta.
 			if (track.tickPointer == 0) {
@@ -47,10 +47,12 @@ class NoteOnEvent {
 
 		} else {
 			this.delta = Utils.getTickDuration(this.wait);
-			this.tick = track.tickPointer + this.delta;
+			this.tick = Utils.getRoundedIfClose(track.tickPointer + this.delta);
 		}
 
-		this.data = Utils.numberToVariableLength(this.delta)
+		this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
+
+		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
 							this.getStatusByte(),
 							this.midiNumber,
