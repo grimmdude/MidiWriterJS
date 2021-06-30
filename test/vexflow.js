@@ -8,13 +8,15 @@ const MidiWriter = require('..');
  * @param {[String]} keys
  * @param {boolean} isDotted
  */
-function mockNote(noteType='n', duration='8', keys=['c/4'], isDotted=false) {
+function mockNote(noteType='n', duration='8', keys=['c/4'], dots=0, tuplet=null, accidentals=null) {
 	const result = {
 		noteType,
 		duration,
 		keys,
-		isDotted() {
-			return isDotted;
+		dots,
+		tuplet,
+		getAccidentals() {
+			return accidentals;
 		}
 	};
 	return result;
@@ -84,9 +86,24 @@ describe('MidiWriterJS', function() {
 
 		describe('#convertPitch()', function() {
 			it('converts pitch', function () {
-				const vexNote = 'pit/ch';
 				const vexFlow = new MidiWriter.VexFlow();
-				assert.strictEqual(vexFlow.convertPitch(vexNote), 'pitch');
+				const tickable = mockNote('n', 'h', ['c/4']);
+				assert.deepStrictEqual(tickable.keys.map((pitch, index) => vexFlow.convertPitch(pitch, index, tickable)), ['c4']);
+			});
+			it('converts multiple pitch', function() {
+				const vexFlow = new MidiWriter.VexFlow();
+				const tickable = mockNote('n', 'h', ['b/4', 'c/4']);
+				assert.deepStrictEqual(tickable.keys.map((pitch, index) => vexFlow.convertPitch(pitch, index, tickable)), ['b4', 'c4']);
+			});
+			it('converts accidentals pitch', function() {
+				const vexFlow = new MidiWriter.VexFlow();
+				const tickable = mockNote('n', 'h', ['b#/4', 'cb/4', 'dn/4']);
+				assert.deepStrictEqual(tickable.keys.map((pitch, index) => vexFlow.convertPitch(pitch, index, tickable)), ['b#4', 'cb4', 'd4']);
+			});
+			it('converts rendered accidentals pitch', function() {
+				const vexFlow = new MidiWriter.VexFlow();
+				const tickable = mockNote('n', 'h', ['b/4', 'c/4'], 0, null, [{index: 0, type: '#'}, {index: 1, type: 'b'}]);
+				assert.deepStrictEqual(tickable.keys.map((pitch, index) => vexFlow.convertPitch(pitch, index, tickable, true)), ['b#4', 'cb4']);
 			});
 		});
 
@@ -104,19 +121,44 @@ describe('MidiWriterJS', function() {
 			});
 			it('converts dotted half, quarter and eighth durations', function () {
 				const vexFlow = new MidiWriter.VexFlow();
-				const tickable = mockNote('n', 'h', ['c4'], true);
+				const tickable = mockNote('n', 'h', ['c/4'], 1);
 				assert.strictEqual(vexFlow.convertDuration(tickable), 'd2');
 				tickable.duration = 'q'
 				assert.strictEqual(vexFlow.convertDuration(tickable), 'd4');
 				tickable.duration = '8'
 				assert.strictEqual(vexFlow.convertDuration(tickable), 'd8');
 			});
-			it('preserves numeric and other durations', function () {
+			it('converts multiple dotted durations', function() {
 				const vexFlow = new MidiWriter.VexFlow();
-				const tickable = mockNote('n', 99);
-				assert.strictEqual(vexFlow.convertDuration(tickable), 99);
-				tickable.duration = 'other'
-				assert.strictEqual(vexFlow.convertDuration(tickable), 'other');
+				const tickable = mockNote('n', 'h', ['c/4'], 2);
+				assert.strictEqual(vexFlow.convertDuration(tickable), 'dd2');
+				tickable.dots = 3
+				assert.strictEqual(vexFlow.convertDuration(tickable), 'ddd2');
+				tickable.dots = 4
+				assert.strictEqual(vexFlow.convertDuration(tickable), 'dddd2');
+			});
+			it('converts tuplet durations', function() {
+				const vexFlow = new MidiWriter.VexFlow();
+				const tickable = mockNote('n', 'h', ['c/4'], 0, {num_notes: 3});
+				assert.strictEqual(vexFlow.convertDuration(tickable), '2t3');
+				tickable.tuplet.num_notes = 5
+				assert.strictEqual(vexFlow.convertDuration(tickable), '2t5');
+				tickable.tuplet.num_notes = 7
+				assert.strictEqual(vexFlow.convertDuration(tickable), '2t7');
+			});
+			it('converts dotted tuplet durations', function() {
+				const vexFlow = new MidiWriter.VexFlow();
+				const tickable = mockNote('n', 'h', ['c/4'], 1, {num_notes: 3});
+				assert.strictEqual(vexFlow.convertDuration(tickable), 'd2t3');
+				tickable.tuplet.num_notes = 5
+				assert.strictEqual(vexFlow.convertDuration(tickable), 'd2t5');
+				tickable.dots = 2
+				assert.strictEqual(vexFlow.convertDuration(tickable), 'dd2t5');
+			});
+			it('returns other durations', function () {
+				const vexFlow = new MidiWriter.VexFlow();
+				const tickable = mockNote('n', '64', ['c/4']);	
+				assert.strictEqual(vexFlow.convertDuration(tickable), '64');
 			});
 		});
 	});

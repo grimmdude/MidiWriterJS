@@ -47,16 +47,6 @@ describe('MidiWriterJS', function() {
 				assert.equal('data:audio/midi;base64,TVRoZAAAAAYAAAABAIBNVHJrAAAARACAUUAygE1AMoBKQDKASEAygENAAIBHQACQPEAAgEBAMoA8QACQQEAykENAAJBHQDKQSEAykEpAMpBNQDKQUUAA/y8A', hcb);
 			});
 		});
-
-		describe('#saveMIDI()', function() {
-			it('save MIDI file successfully.', function () {
-				const track = new MidiWriter.Track();
-				const note = new MidiWriter.NoteEvent({pitch: 'C4', duration: '4'});
-				track.addEvent(note);
-				const write = new MidiWriter.Writer(track);
-				write.saveMIDI('test.mid');
-			});
-		});
 	});
 
 });

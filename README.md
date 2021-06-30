@@ -2,6 +2,7 @@
 ===============
 [![npm version](https://badge.fury.io/js/midi-writer-js.svg)](https://badge.fury.io/js/midi-writer-js)
 [![Build Status](https://travis-ci.org/grimmdude/MidiWriterJS.svg?branch=master)](https://travis-ci.org/grimmdude/MidiWriterJS)
+[![Try midi-writer-js on RunKit](https://badge.runkitcdn.com/midi-writer-js.svg)](https://npm.runkit.com/midi-writer-js)
 
 MidiWriterJS is a JavaScript library providing an API for generating expressive multi-track MIDI files.  
 

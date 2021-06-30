@@ -7,14 +7,14 @@ class VexFlow {
 	 * Support for converting VexFlow voice into MidiWriterJS track
 	 * @return MidiWriter.Track object
 	 */
-	trackFromVoice(voice) {
+	trackFromVoice(voice, options={addRenderedAccidentals: false}) {
 		const track = new Track();
 		let wait = [];
 
 		voice.tickables.forEach(tickable => {
 			if (tickable.noteType === 'n') {
 				track.addEvent(new NoteEvent({
-					pitch: tickable.keys.map(this.convertPitch),
+					pitch: tickable.keys.map((pitch, index) => this.convertPitch(pitch, index, tickable, options.addRenderedAccidentals)),
 					duration: this.convertDuration(tickable),
 					wait
 				}));
@@ -40,9 +40,31 @@ class VexFlow {
 	/**
 	 * Converts VexFlow pitch syntax to MidiWriterJS syntax
 	 * @param pitch string
+	 * @param index pitch index
+	 * @param note struct from Vexflow
+	 * @param addRenderedAccidentals adds Vexflow rendered accidentals
 	 */
-	convertPitch(pitch) {
-		return pitch.replace('/', '');
+	convertPitch(pitch, index, note, addRenderedAccidentals=false) {
+		// Splits note name from octave
+		const pitchParts = pitch.split('/');
+
+		// Retrieves accidentals from pitch
+		// Removes natural accidentals since they are not accepted in Tonal Midi
+		let accidentals = pitchParts[0].substring(1).replace('n', '');
+		
+		if (addRenderedAccidentals) {
+			note.getAccidentals()?.forEach(accidental => {
+				if (accidental.index === index) {
+					if (accidental.type === 'n') {
+						accidentals = '';
+					} else {
+						accidentals += accidental.type;
+					}
+				}
+			});
+		}
+
+		return pitchParts[0][0] + accidentals + pitchParts[1];
 	}
 
 	/**
@@ -50,18 +72,25 @@ class VexFlow {
 	 * @param note struct from VexFlow
 	 */
 	convertDuration(note) {
-		switch (note.duration) {
+		return 'd'.repeat(note.dots) + this.convertBaseDuration(note.duration) + (note.tuplet ? 't' + note.tuplet.num_notes : '');
+	}
+
+	/**
+	 * Converts VexFlow base duration syntax to MidiWriterJS syntax
+	 * @param duration Vexflow duration
+	 * @returns MidiWriterJS duration
+	 */
+	convertBaseDuration(duration) {
+		switch (duration) {
 			case 'w':
 				return '1';
 			case 'h':
-				return note.isDotted() ? 'd2' : '2';
+				return '2';
 			case 'q':
-				return note.isDotted() ? 'd4' : '4';
-			case '8':
-				return note.isDotted() ? 'd8' : '8';
+				return '4';
+			default:
+				return duration;
 		}
-
-		return note.duration;
 	}
 }
 

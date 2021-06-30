@@ -57,18 +57,6 @@ class Writer {
     stdout() {
 		return process.stdout.write(new Buffer(this.buildFile()));
     }
-
-	/**
-	 * Save to MIDI file
-	 * @param {string} filename
-	 */
-	saveMIDI(filename) {
-		const fs = require('fs');
-		const buffer = new Buffer.from(this.buildFile());
-		fs.writeFile(filename + '.mid', buffer, function (err) {
-			if(err) throw err;
-		});
-	}
 }
 
 export {Writer};
