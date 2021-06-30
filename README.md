@@ -8,7 +8,7 @@ MidiWriterJS is a JavaScript library providing an API for generating expressive 
 
 Note that the `master` branch is in active development so if you're looking for a tried and true stable version please use the latest release.
 
-[Source Documentation](http://grimmdude.com/MidiWriterJS/docs/)
+[Source Documentation](https://grimmdude.com/MidiWriterJS/docs/)
 
 Install
 ------------

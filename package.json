@@ -1,6 +1,6 @@
 {
   "name": "midi-writer-js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A library providing an API for generating MIDI files.",
   "main": "build/index.js",
   "types": "types.d.ts",
@@ -19,8 +19,8 @@
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.1",
     "jsdoc": "^3.6.4",
-    "minami": "^1.1.1",
-    "mocha": "^6.2.3",
+    "minami": "^1.2.3",
+    "mocha": "^9.0.1",
     "nyc": "^15.0.1",
     "rollup": "^2.9.0",
     "watch": "^1.0.2"
