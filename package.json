@@ -1,6 +1,6 @@
 {
   "name": "midi-writer-js",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A library providing an API for generating MIDI files.",
   "main": "build/index.js",
   "types": "types.d.ts",

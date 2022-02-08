@@ -3,17 +3,22 @@ import {Utils} from '../utils';
 
 /**
  * Object representation of a cue point meta event.
- * @param {string} text - Cue point text
+ * @param {object} fields {text: string, delta: integer}
  * @return {CuePointEvent}
  */
 class CuePointEvent {
-	constructor(text) {
-		this.type = 'marker';
+	constructor(fields) {
+		// Set default fields
+		fields = Object.assign({
+			delta: 0x00,
+		}, fields);
 
-		const textBytes = Utils.stringToBytes(text);
+		this.type = 'cue-point';
+
+		const textBytes = Utils.stringToBytes(fields.text);
 
 		// Start with zero time delta
-		this.data = Utils.numberToVariableLength(0x00).concat(
+		this.data = Utils.numberToVariableLength(fields.delta).concat(
 			Constants.META_EVENT_ID,
 			Constants.META_CUE_POINT,
 			Utils.numberToVariableLength(textBytes.length), // Size

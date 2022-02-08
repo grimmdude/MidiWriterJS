@@ -89,7 +89,7 @@ declare module "midi-writer-js" {
 			event: EventType | EventType[],
 			mapFunction?: (index: number, event: EventType) => Partial<EventType>
 		): void;
-		setTempo(tempo: number): void;
+		setTempo(tempo: number, tick: number): void;
 		addText(text: string): void;
 		addCopyright(text: string): void;
 		addTrackName(text: string): void;
