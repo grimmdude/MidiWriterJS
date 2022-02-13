@@ -36,10 +36,11 @@ class Utils {
 	 * Returns the correct MIDI number for the specified pitch.
 	 * Uses Tonal Midi - https://github.com/danigb/tonal/tree/master/packages/midi
 	 * @param {(string|number)} pitch - 'C#4' or midi note code
+	 * @param {string} middleC
 	 * @return {number}
 	 */
-	static getPitch(pitch) {
-		return toMidi(pitch);
+	static getPitch(pitch, middleC = 'C4') {
+		return 60 - toMidi(middleC) + toMidi(pitch);
 	}
 
 	/**

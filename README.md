@@ -18,20 +18,20 @@ npm install midi-writer-js
 Getting Started
 ------------
 ```javascript
-var MidiWriter = require('midi-writer-js');
+const MidiWriter = require('midi-writer-js');
 
 // Start with a new track
-var track = new MidiWriter.Track();
+const track = new MidiWriter.Track();
 
 // Define an instrument (optional):
 track.addEvent(new MidiWriter.ProgramChangeEvent({instrument: 1}));
 
 // Add some notes:
-var note = new MidiWriter.NoteEvent({pitch: ['C4', 'D4', 'E4'], duration: '4'});
+const note = new MidiWriter.NoteEvent({pitch: ['C4', 'D4', 'E4'], duration: '4'});
 track.addEvent(note);
 
 // Generate a data URI
-var write = new MidiWriter.Writer(track);
+const write = new MidiWriter.Writer(track);
 console.log(write.dataUri());
 ```
 Documentation
@@ -58,6 +58,7 @@ The `NoteEvent` supports these options:
 		<tr>
 			<th>Name</th>
 			<th>Type</th>
+			<th>Default</th>
 			<th>Description</th>
 		</tr>
 	</thead>
@@ -65,11 +66,13 @@ The `NoteEvent` supports these options:
 		<tr>
 			<td><b>pitch</b></td>
 			<td>string or array</td>
+			<td></td>
 			<td>Each pitch can be a string or valid MIDI note code.  Format for string is <code>C#4</code>.  Pro tip: You can use the output from <a href="https://github.com/danigb/tonal" target="_blank">tonal</a> functions to build scales, chords, intervals, etc. in this parameter.</td>
 		</tr>
 		<tr>
 			<td><b>duration</b></td>
 			<td>string or array</td>
+			<td></td>
 			<td>
 				How long the note should sound.
 				<ul>
@@ -97,36 +100,43 @@ The `NoteEvent` supports these options:
 		<tr>
 			<td><b>wait</b></td>
 			<td>string or array</td>
+			<td><code>0</code></td>
 			<td>How long to wait before sounding note (rest).  Takes same values as <b>duration</b>.</td>
 		</tr>
 		<tr>
 			<td><b>sequential</b></td>
 			<td>boolean</td>
-			<td>If true then array of pitches will be played sequentially as opposed to simulatanously.  Default: <code>false</code></td>
+			<td><code>false</code></td>
+			<td>If true then array of pitches will be played sequentially as opposed to simulatanously.</td>
 		</tr>
 		<tr>
 			<td><b>velocity</b></td>
 			<td>number</td>
-			<td>How loud the note should sound, values 1-100.  Default: <code>50</code></td>
+			<td><code>50</code></td>
+			<td>How loud the note should sound, values 1-100.</td>
 		</tr>
 		<tr>
 			<td><b>repeat</b></td>
 			<td>number</td>
-			<td>How many times this event should be repeated. Default: <code>1</code></td>
+			<td><code>1</code></td>
+			<td>How many times this event should be repeated.</td>
 		</tr>
 		<tr>
 			<td><b>channel</b></td>
 			<td>number</td>
-			<td>MIDI channel to use. Default: <code>1</code></td>
+			<td><code>1</code></td>
+			<td>MIDI channel to use.</td>
 		</tr>
 		<tr>
 			<td><b>grace</b></td>
 			<td>string or array</td>
+			<td></td>
 			<td>Grace note to be applied to note event.  Takes same value format as <code>pitch</code></td>
 		</tr>
 		<tr>
 			<td><b>startTick</b></td>
 			<td>number</td>
+			<td></td>
 			<td>Specific tick where this event should be played.  If this parameter is supplied then <code>wait</code> is disregarded if also supplied.</td>
 		</tr>
 	</tbody>
@@ -144,9 +154,9 @@ The `Writer` class provides a few ways to output the file:
 Here's an example of how everyone's favorite song "Hot Cross Buns" could be written.  Note use of the mapping function passed as the second argument of `addEvent()`.  This can be used to apply specific properties to all events.  With some 
 street smarts you could also use it for programmatic crescendos and other property 'animation'.
 ```javascript
-var MidiWriter = require('midi-writer-js');
+const MidiWriter = require('midi-writer-js');
 
-var track = new MidiWriter.Track();
+const track = new MidiWriter.Track();
 
 track.addEvent([
 		new MidiWriter.NoteEvent({pitch: ['E4','D4'], duration: '4'}),
@@ -161,7 +171,7 @@ track.addEvent([
   }
 );
 
-var write = new MidiWriter.Writer(track);
+const write = new MidiWriter.Writer(track);
 console.log(write.dataUri());
 ```
 
@@ -170,10 +180,10 @@ MidiWriterJS can export MIDI from VexFlow voices, though this feature is still e
 ```javascript
 
 // ...VexFlow code defining notes
-var voice = create_4_4_voice().addTickables(notes);
+const voice = create_4_4_voice().addTickables(notes);
 
-var vexWriter = new MidiWriter.VexFlow();
-var track = vexWriter.trackFromVoice(voice);
-var writer = new MidiWriter.Writer([track]);
+const vexWriter = new MidiWriter.VexFlow();
+const track = vexWriter.trackFromVoice(voice);
+const writer = new MidiWriter.Writer([track]);
 console.log(writer.dataUri());
 ```

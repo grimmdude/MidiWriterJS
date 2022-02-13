@@ -89,9 +89,10 @@ class Track {
 
 	/**
 	 * Builds int array of all events.
+	 * @param {object} options
 	 * @return {Track}
 	 */
-	buildData() {
+	buildData(options = {}) {
 		// Remove existing end track event and add one.
 		// This makes sure it's at the very end of the event list.
 		this.removeEventsByType('end-track').addEvent(new EndTrackEvent());
@@ -106,13 +107,15 @@ class Track {
 		this.events.forEach((event, eventIndex) => {
 			// Build event & add to total tick duration
 			if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
-				const built = event.buildData(this, precisionLoss);
+				const built = event.buildData(this, precisionLoss, options);
 				precisionLoss = Utils.getPrecisionLoss(event.deltaWithPrecisionCorrection || 0);
 				this.data = this.data.concat(built.data);
 				this.tickPointer = Utils.getRoundedIfClose(event.tick);
+
 			} else if (event instanceof TempoEvent) {
 				this.tickPointer = Utils.getRoundedIfClose(event.tick);
 				this.data = this.data.concat(event.data);
+
 			} else {
 				this.data = this.data.concat(event.data);
 			}

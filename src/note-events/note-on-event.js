@@ -22,7 +22,6 @@ class NoteOnEvent {
 		this.velocity 	= fields.velocity;
 		this.startTick 	= fields.startTick;
 
-		this.midiNumber = Utils.getPitch(this.pitch);
 		this.tick 		= null;
 		this.delta 		= null;
 		this.data 		= fields.data;
@@ -33,7 +32,7 @@ class NoteOnEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOnEvent}
 	 */
-	buildData(track, precisionDelta) {
+	buildData(track, precisionDelta, options = {}) {
 		this.data = [];
 
 		// Explicitly defined startTick event
@@ -55,7 +54,7 @@ class NoteOnEvent {
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
 							this.getStatusByte(),
-							this.midiNumber,
+							Utils.getPitch(this.pitch, options.middleC),
 							Utils.convertVelocity(this.velocity)
 					);
 

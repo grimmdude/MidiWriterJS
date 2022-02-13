@@ -43,4 +43,4 @@ track.addEvent([
 
 var write = new MidiWriter.Writer(track);
 console.log(write.dataUri());
-module.exports = write.dataUri();
+module.exports = write;

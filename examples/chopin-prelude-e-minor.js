@@ -140,4 +140,4 @@ var write = new MidiWriter.Writer(tracks);
 console.log(write.dataUri());
 //write.stdout();
 
-module.exports = write.dataUri();
+module.exports = write;

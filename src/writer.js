@@ -4,20 +4,30 @@ import {Utils} from './utils';
 /**
  * Object that puts together tracks and provides methods for file output.
  * @param {array|Track} tracks - A single {Track} object or an array of {Track} objects.
+ * @param {object} options - {middleC: 'C4'}
  * @return {Writer}
  */
 class Writer {
-	constructor(tracks) {
-		// Ensure track is an array
-		tracks = Utils.toArray(tracks);
+	constructor(tracks, options = {}) {
+		// Ensure tracks is an array
+		this.tracks = Utils.toArray(tracks);
+		this.options = options;
+	}
 
-		this.data = [];
-		this.data.push(new HeaderChunk(tracks.length))
+	/**
+	 * Builds array of data from chunkschunks.
+	 * @return {array}
+	 */
+	buildData() {
+		const data = [];
+		data.push(new HeaderChunk(this.tracks.length))
 
 		// For each track add final end of track event and build data
-		tracks.forEach((track, i) => {
-			this.data.push(track.buildData());
+		this.tracks.forEach((track, i) => {
+			data.push(track.buildData(this.options));
 		});
+
+		return data;
 	}
 
 	/**
@@ -28,7 +38,7 @@ class Writer {
 		var build = [];
 
 		// Data consists of chunks which consists of data
-		this.data.forEach((d) => build = build.concat(d.type, d.size, d.data));
+		this.buildData().forEach((d) => build = build.concat(d.type, d.size, d.data));
 
 		return new Uint8Array(build);
 	}
@@ -50,12 +60,24 @@ class Writer {
 		return 'data:audio/midi;base64,' + this.base64();
     }
 
+
+	/**
+	 * Set option on instantiated Writer.
+	 * @param {string} key
+	 * @param {any} value
+	 * @return {Writer}
+	 */
+	setOption(key, value) {
+		this.options[key] = value;
+		return this;
+	}
+
 	/**
 	 * Output to stdout
 	 * @return {string}
 	 */
     stdout() {
-		return process.stdout.write(new Buffer(this.buildFile()));
+		return process.stdout.write(Buffer.from(this.buildFile()));
     }
 }
 

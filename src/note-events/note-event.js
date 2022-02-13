@@ -1,4 +1,3 @@
-import {Constants} from '../constants';
 import {NoteOnEvent} from './note-on-event';
 import {NoteOffEvent} from './note-off-event';
 import {Utils} from '../utils';

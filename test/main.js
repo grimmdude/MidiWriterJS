@@ -233,9 +233,11 @@ describe('MidiWriterJS', function() {
 			it('should return 101 when "F7" is passed.', function () {
 				assert.equal(101, MidiWriter.Utils.getPitch('F7'));
 			});
-		});
 
-		describe('#getPitch()', function () {
+			it('should return 98 when "D6" is passed and middle C is set to "C3".', function () {
+				assert.equal(98, MidiWriter.Utils.getPitch('D6', 'C3'));
+			});
+
 			it('should return 72 (C5) when "B#4" is passed.', function () {
 				assert.equal(72, MidiWriter.Utils.getPitch('B#4'));
 			});

@@ -20,7 +20,6 @@ class NoteOffEvent {
 		this.duration 	= fields.duration;
 		this.velocity 	= fields.velocity;
 
-		this.midiNumber = Utils.getPitch(this.pitch);
 		this.tick 		= fields.tick;
 		this.delta 		= Utils.getTickDuration(this.duration);
 		this.data 		= fields.data;
@@ -31,7 +30,7 @@ class NoteOffEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOffEvent}
 	 */
-	buildData(track, precisionDelta) {
+	buildData(track, precisionDelta, options = {}) {
 		if (this.tick === null) {
 			this.tick = Utils.getRoundedIfClose(this.delta + track.tickPointer);
 		}
@@ -41,7 +40,7 @@ class NoteOffEvent {
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
 							this.getStatusByte(),
-							this.midiNumber,
+							Utils.getPitch(this.pitch, options.middleC),
 							Utils.convertVelocity(this.velocity)
 					);
 

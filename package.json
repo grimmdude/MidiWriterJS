@@ -1,6 +1,6 @@
 {
   "name": "midi-writer-js",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A library providing an API for generating MIDI files.",
   "main": "build/index.js",
   "types": "types.d.ts",
@@ -12,6 +12,8 @@
     "@babel/plugin-transform-destructuring": "^7.9.5",
     "@babel/preset-env": "^7.9.6",
     "@rollup/plugin-babel": "^5.0.0",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-replace": "^2.4.2",
     "eslint": "^7.0.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.20.2",
@@ -31,7 +33,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "mkdir -p build && rollup -c && npm run docs",
+    "build": "mkdir -p build && rollup -c",
     "docs": "./node_modules/.bin/jsdoc -r src README.md -d ./docs -t ./node_modules/minami",
     "lint:js": "eslint 'src/**/**.js'",
     "prepublishOnly": "npm test",

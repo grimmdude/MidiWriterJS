@@ -133,4 +133,4 @@ tracks[2].addEvent(notes);
 var write = new MidiWriter.Writer(tracks);
 
 console.log(write.dataUri());
-module.exports = write.dataUri();
+module.exports = write;
