@@ -104,7 +104,7 @@ class Track {
 
 		let precisionLoss = 0;
 
-		this.events.forEach((event, eventIndex) => {
+		this.events.forEach((event) => {
 			// Build event & add to total tick duration
 			if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
 				const built = event.buildData(this, precisionLoss, options);
@@ -173,7 +173,7 @@ class Track {
 		// Find index of existing event we need to follow with
 		var lastEventIndex = 0;
 
-		for (var i = 0; i < this.events.length; i++) {
+		for (let i = 0; i < this.events.length; i++) {
 			if (this.events[i].tick > event.tick) break;
 			lastEventIndex = i;
 		}
@@ -187,7 +187,7 @@ class Track {
 		this.events.splice(splicedEventIndex, 0, event);
 
 		// Now adjust delta of all following events
-		for (var i = splicedEventIndex + 1; i < this.events.length; i++) {
+		for (let i = splicedEventIndex + 1; i < this.events.length; i++) {
 			// Since each existing event should have a tick value at this point we just need to
 			// adjust delta to that the event still falls on the correct tick.
 			this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
@@ -216,7 +216,7 @@ class Track {
 	 * @return {Track}
 	 */
 	setTempo(bpm, tick = 0) {
-	   return this.addEvent(new TempoEvent({bpm, tick}));
+		return this.addEvent(new TempoEvent({bpm, tick}));
 	}
 
 	/**

@@ -6,7 +6,7 @@ var MidiWriter = (function () {
 	 * @return {Constants}
 	 */
 	var Constants = {
-	  VERSION: '2.1.0',
+	  VERSION: '2.1.1',
 	  HEADER_CHUNK_TYPE: [0x4d, 0x54, 0x68, 0x64],
 	  // Mthd
 	  HEADER_CHUNK_LENGTH: [0x00, 0x00, 0x00, 0x06],
@@ -33,8 +33,6 @@ var MidiWriter = (function () {
 	  META_KEY_SIGNATURE_ID: 0x59,
 	  META_END_OF_TRACK_ID: [0x2F, 0x00],
 	  CONTROLLER_CHANGE_STATUS: 0xB0,
-	  // includes channel number (0)
-	  PROGRAM_CHANGE_STATUS: 0xC0,
 	  // includes channel number (0)
 	  PITCH_BEND_STATUS: 0xE0 // includes channel number (0)
 
@@ -350,7 +348,7 @@ var MidiWriter = (function () {
 	    key: "numberToVariableLength",
 	    value: function numberToVariableLength(ticks) {
 	      ticks = Math.round(ticks);
-	      var buffer = ticks & 0x7F;
+	      var buffer = ticks & 0x7F; // eslint-disable-next-line no-cond-assign
 
 	      while (ticks = ticks >> 7) {
 	        buffer <<= 8;
@@ -479,7 +477,13 @@ var MidiWriter = (function () {
 
 	      if (duration.toLowerCase().charAt(0) === 't') {
 	        // If duration starts with 't' then the number that follows is an explicit tick count
-	        return parseInt(duration.substring(1));
+	        var ticks = parseInt(duration.substring(1));
+
+	        if (isNaN(ticks) || ticks < 0) {
+	          throw new Error(duration + ' is not a valid duration.');
+	        }
+
+	        return ticks;
 	      } // Need to apply duration here.  Quarter note == Constants.HEADER_CHUNK_DIVISION
 
 
@@ -754,14 +758,12 @@ var MidiWriter = (function () {
 	      var _this = this;
 
 	      // Reset data array
-	      this.data = [];
-	      this.tickDuration;
-	      this.restDuration; // Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
+	      this.data = []; // Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
 
 	      if (this.grace) {
 	        var graceDuration = 1;
 	        this.grace = Utils.toArray(this.grace);
-	        this.grace.forEach(function (pitch) {
+	        this.grace.forEach(function () {
 	          var noteEvent = new NoteEvent({
 	            pitch: _this.grace,
 	            duration: 'T' + graceDuration
@@ -769,15 +771,20 @@ var MidiWriter = (function () {
 	          _this.data = _this.data.concat(noteEvent.data);
 	        });
 	      } // fields.pitch could be an array of pitches.
+	      // If so create note events for each and apply the same duration.
+	      // By default this is a chord if it's an array of notes that requires one NoteOnEvent.
 	      // If this.sequential === true then it's a sequential string of notes that requires separate NoteOnEvents.
+
 
 	      if (!this.sequential) {
 	        // Handle repeat
 	        for (var j = 0; j < this.repeat; j++) {
 	          // Note on
 	          this.pitch.forEach(function (p, i) {
+	            var noteOnNew;
+
 	            if (i == 0) {
-	              var noteOnNew = new NoteOnEvent({
+	              noteOnNew = new NoteOnEvent({
 	                channel: _this.channel,
 	                wait: _this.wait,
 	                velocity: _this.velocity,
@@ -787,7 +794,7 @@ var MidiWriter = (function () {
 	            } else {
 	              // Running status (can ommit the note on status)
 	              //noteOn = new NoteOnEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
-	              var noteOnNew = new NoteOnEvent({
+	              noteOnNew = new NoteOnEvent({
 	                channel: _this.channel,
 	                wait: 0,
 	                velocity: _this.velocity,
@@ -800,9 +807,11 @@ var MidiWriter = (function () {
 	          }); // Note off
 
 	          this.pitch.forEach(function (p, i) {
+	            var noteOffNew;
+
 	            if (i == 0) {
 	              //noteOff = new NoteOffEvent({data: Utils.numberToVariableLength(tickDuration).concat(this.getNoteOffStatus(), Utils.getPitch(p), Utils.convertVelocity(this.velocity))});
-	              var noteOffNew = new NoteOffEvent({
+	              noteOffNew = new NoteOffEvent({
 	                channel: _this.channel,
 	                duration: _this.duration,
 	                velocity: _this.velocity,
@@ -812,7 +821,7 @@ var MidiWriter = (function () {
 	            } else {
 	              // Running status (can ommit the note off status)
 	              //noteOff = new NoteOffEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
-	              var noteOffNew = new NoteOffEvent({
+	              noteOffNew = new NoteOffEvent({
 	                channel: _this.channel,
 	                duration: 0,
 	                velocity: _this.velocity,
@@ -826,9 +835,8 @@ var MidiWriter = (function () {
 	        }
 	      } else {
 	        // Handle repeat
-	        for (var j = 0; j < this.repeat; j++) {
+	        for (var _j = 0; _j < this.repeat; _j++) {
 	          this.pitch.forEach(function (p, i) {
-
 	            var noteOnNew = new NoteOnEvent({
 	              channel: _this.channel,
 	              wait: i > 0 ? 0 : _this.wait,
@@ -892,17 +900,36 @@ var MidiWriter = (function () {
 	 * @return {ProgramChangeEvent}
 	 */
 
-	var ProgramChangeEvent = /*#__PURE__*/_createClass(function ProgramChangeEvent(fields) {
-	  _classCallCheck(this, ProgramChangeEvent);
+	var ProgramChangeEvent = /*#__PURE__*/function () {
+	  function ProgramChangeEvent(fields) {
+	    _classCallCheck(this, ProgramChangeEvent);
 
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'program'; // delta time defaults to 0.
+	    // Set default fields
+	    this.fields = Object.assign({
+	      channel: 1,
+	      delta: 0x00
+	    }, fields);
+	    this.type = 'program'; // delta time defaults to 0.
 
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.PROGRAM_CHANGE_STATUS, fields.instrument);
-	});
+	    this.data = Utils.numberToVariableLength(this.fields.delta).concat(this.getStatusByte(), this.fields.instrument);
+	  }
+	  /**
+	   * Gets the status code based on the selected channel. 0xC{0-F}
+	   * Program change status byte for channel 0 is 0xC0 (192)
+	   * 0 = Ch 1
+	   * @return {number}
+	   */
+
+
+	  _createClass(ProgramChangeEvent, [{
+	    key: "getStatusByte",
+	    value: function getStatusByte() {
+	      return 192 + this.fields.channel - 1;
+	    }
+	  }]);
+
+	  return ProgramChangeEvent;
+	}();
 
 	/**
 	 * Holds all data for a "controller change" MIDI event
@@ -1282,7 +1309,7 @@ var MidiWriter = (function () {
 	      this.size = [];
 	      this.tickPointer = 0;
 	      var precisionLoss = 0;
-	      this.events.forEach(function (event, eventIndex) {
+	      this.events.forEach(function (event) {
 	        // Build event & add to total tick duration
 	        if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
 	          var built = event.buildData(_this2, precisionLoss, options);
@@ -1371,10 +1398,10 @@ var MidiWriter = (function () {
 
 	      this.events.splice(splicedEventIndex, 0, event); // Now adjust delta of all following events
 
-	      for (var i = splicedEventIndex + 1; i < this.events.length; i++) {
+	      for (var _i = splicedEventIndex + 1; _i < this.events.length; _i++) {
 	        // Since each existing event should have a tick value at this point we just need to
 	        // adjust delta to that the event still falls on the correct tick.
-	        this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
+	        this.events[_i].delta = this.events[_i].tick - this.events[_i - 1].tick;
 	      }
 	    }
 	    /**
@@ -1609,7 +1636,6 @@ var MidiWriter = (function () {
 	          // move on to the next tickable and add this to the stack
 	          // of the `wait` property for the next note event
 	          wait.push(_this.convertDuration(tickable));
-	          return;
 	        }
 	      }); // There may be outstanding rests at the end of the track,
 	      // pad with a ghost note (zero duration and velocity), just to capture the wait.
@@ -1744,7 +1770,7 @@ var MidiWriter = (function () {
 	      var data = [];
 	      data.push(new HeaderChunk(this.tracks.length)); // For each track add final end of track event and build data
 
-	      this.tracks.forEach(function (track, i) {
+	      this.tracks.forEach(function (track) {
 	        data.push(track.buildData(_this.options));
 	      });
 	      return data;

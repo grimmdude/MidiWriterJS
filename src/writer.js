@@ -23,7 +23,7 @@ class Writer {
 		data.push(new HeaderChunk(this.tracks.length))
 
 		// For each track add final end of track event and build data
-		this.tracks.forEach((track, i) => {
+		this.tracks.forEach((track) => {
 			data.push(track.buildData(this.options));
 		});
 

@@ -7,7 +7,7 @@ class VexFlow {
 	 * Support for converting VexFlow voice into MidiWriterJS track
 	 * @return MidiWriter.Track object
 	 */
-	trackFromVoice(voice, options={addRenderedAccidentals: false}) {
+	trackFromVoice(voice, options = {addRenderedAccidentals: false}) {
 		const track = new Track();
 		let wait = [];
 
@@ -24,7 +24,6 @@ class VexFlow {
 				// move on to the next tickable and add this to the stack
 				// of the `wait` property for the next note event
 				wait.push(this.convertDuration(tickable));
-				return;
 			}
 		});
 
@@ -44,7 +43,7 @@ class VexFlow {
 	 * @param note struct from Vexflow
 	 * @param addRenderedAccidentals adds Vexflow rendered accidentals
 	 */
-	convertPitch(pitch, index, note, addRenderedAccidentals=false) {
+	convertPitch(pitch, index, note, addRenderedAccidentals = false) {
 		// Splits note name from octave
 		const pitchParts = pitch.split('/');
 

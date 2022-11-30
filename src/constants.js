@@ -4,7 +4,7 @@
  */
 
 const Constants = {
-	VERSION					: '2.1.0',
+	VERSION					: '2.1.1',
 	HEADER_CHUNK_TYPE  		: [0x4d, 0x54, 0x68, 0x64], // Mthd
 	HEADER_CHUNK_LENGTH  	: [0x00, 0x00, 0x00, 0x06], // Header size for SMF
 	HEADER_CHUNK_FORMAT0    : [0x00, 0x00], // Midi Type 0 id
@@ -25,7 +25,6 @@ const Constants = {
 	META_KEY_SIGNATURE_ID	: 0x59,
 	META_END_OF_TRACK_ID	: [0x2F, 0x00],
 	CONTROLLER_CHANGE_STATUS: 0xB0, // includes channel number (0)
-	PROGRAM_CHANGE_STATUS	: 0xC0, // includes channel number (0)
 	PITCH_BEND_STATUS       : 0xE0, // includes channel number (0)
 };
 

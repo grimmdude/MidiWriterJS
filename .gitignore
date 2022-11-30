@@ -4,7 +4,6 @@ node_modules
 build
 index.html
 index.js
-package-lock.json
 yarn.lock
 
 # test artifacts

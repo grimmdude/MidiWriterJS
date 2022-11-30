@@ -1,6 +1,6 @@
 declare module "midi-writer-js" {
 	type BaseDuration = "1" | "2" | "4" | "8" | "16" | "32" | "64";
-	type TickDuration = `T{number}`;
+	type TickDuration = `T${number}`;
 	type DottedDuration = `d${BaseDuration}`;
 	type DoubleDottedDuration = `dd${BaseDuration}`;
 	type TripletDuration = `${BaseDuration}t`;

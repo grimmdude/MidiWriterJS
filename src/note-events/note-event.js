@@ -46,33 +46,30 @@ class NoteEvent {
 		// Reset data array
 		this.data = [];
 
-		var tickDuration = this.tickDuration;
-		var restDuration = this.restDuration;
-
 		// Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
 		if (this.grace) {
 			let graceDuration = 1;
 			this.grace = Utils.toArray(this.grace);
-			this.grace.forEach((pitch) => {
-				let noteEvent = new NoteEvent({pitch:this.grace, duration:'T' + graceDuration});
-				this.data = this.data.concat(noteEvent.data)
-
-				tickDuration -= graceDuration;
+			this.grace.forEach(() => {
+				let noteEvent = new NoteEvent({pitch: this.grace, duration:'T' + graceDuration});
+				this.data = this.data.concat(noteEvent.data);
 			});
 		}
 
 		// fields.pitch could be an array of pitches.
 		// If so create note events for each and apply the same duration.
-		var noteOn, noteOff;
+
 		// By default this is a chord if it's an array of notes that requires one NoteOnEvent.
 		// If this.sequential === true then it's a sequential string of notes that requires separate NoteOnEvents.
 		if ( ! this.sequential) {
 			// Handle repeat
-			for (var j = 0; j < this.repeat; j++) {
+			for (let j = 0; j < this.repeat; j++) {
 				// Note on
 				this.pitch.forEach((p, i) => {
+					let noteOnNew;
+
 					if (i == 0) {
-						var noteOnNew = new NoteOnEvent({
+						noteOnNew = new NoteOnEvent({
 							channel: this.channel,
 							wait: this.wait,
 							velocity: this.velocity,
@@ -83,7 +80,7 @@ class NoteEvent {
 					} else {
 						// Running status (can ommit the note on status)
 						//noteOn = new NoteOnEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
-						var noteOnNew = new NoteOnEvent({
+						noteOnNew = new NoteOnEvent({
 							channel: this.channel,
 							wait: 0,
 							velocity: this.velocity,
@@ -97,9 +94,11 @@ class NoteEvent {
 
 				// Note off
 				this.pitch.forEach((p, i) => {
+					let noteOffNew;
+
 					if (i == 0) {
 						//noteOff = new NoteOffEvent({data: Utils.numberToVariableLength(tickDuration).concat(this.getNoteOffStatus(), Utils.getPitch(p), Utils.convertVelocity(this.velocity))});
-						var noteOffNew = new NoteOffEvent({
+						noteOffNew = new NoteOffEvent({
 							channel: this.channel,
 							duration: this.duration,
 							velocity: this.velocity,
@@ -110,7 +109,7 @@ class NoteEvent {
 					} else {
 						// Running status (can ommit the note off status)
 						//noteOff = new NoteOffEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
-						var noteOffNew = new NoteOffEvent({
+						noteOffNew = new NoteOffEvent({
 							channel: this.channel,
 							duration: 0,
 							velocity: this.velocity,
@@ -125,14 +124,9 @@ class NoteEvent {
 
 		} else {
 			// Handle repeat
-			for (var j = 0; j < this.repeat; j++) {
+			for (let j = 0; j < this.repeat; j++) {
 				this.pitch.forEach((p, i) => {
-					// restDuration only applies to first note
-					if (i > 0) {
-						restDuration = 0;
-					}
-
-					var noteOnNew = new NoteOnEvent({
+					const noteOnNew = new NoteOnEvent({
 						channel: this.channel,
 						wait: (i > 0 ? 0 : this.wait), // wait only applies to first note in repetition
 						velocity: this.velocity,
@@ -140,7 +134,7 @@ class NoteEvent {
 						startTick: this.startTick,
 					});
 
-					var noteOffNew = new NoteOffEvent({
+					const noteOffNew = new NoteOffEvent({
 						channel: this.channel,
 						duration: this.duration,
 						velocity: this.velocity,

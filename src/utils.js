@@ -56,6 +56,7 @@ class Utils {
 		ticks = Math.round(ticks);
 		var buffer = ticks & 0x7F;
 
+		// eslint-disable-next-line no-cond-assign
 		while (ticks = ticks >> 7) {
 			buffer <<= 8;
 			buffer |= ((ticks & 0x7F) | 0x80);
@@ -174,7 +175,13 @@ class Utils {
 
 		if (duration.toLowerCase().charAt(0) === 't') {
 			// If duration starts with 't' then the number that follows is an explicit tick count
-			return parseInt(duration.substring(1));
+			const ticks = parseInt(duration.substring(1));
+
+			if (isNaN(ticks) || ticks < 0) {
+				throw new Error(duration + ' is not a valid duration.');
+			}
+
+			return ticks;
 		}
 
 		// Need to apply duration here.  Quarter note == Constants.HEADER_CHUNK_DIVISION
