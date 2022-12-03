@@ -6,7 +6,7 @@ var MidiWriter = (function () {
 	 * @return {Constants}
 	 */
 	var Constants = {
-	  VERSION: '2.1.1',
+	  VERSION: '2.1.2',
 	  HEADER_CHUNK_TYPE: [0x4d, 0x54, 0x68, 0x64],
 	  // Mthd
 	  HEADER_CHUNK_LENGTH: [0x00, 0x00, 0x00, 0x06],
@@ -579,6 +579,183 @@ var MidiWriter = (function () {
 	}();
 
 	/**
+	 * Holds all data for a "controller change" MIDI event
+	 * @param {object} fields {controllerNumber: integer, controllerValue: integer, delta: integer}
+	 * @return {ControllerChangeEvent}
+	 */
+
+	var ControllerChangeEvent = /*#__PURE__*/_createClass(function ControllerChangeEvent(fields) {
+	  _classCallCheck(this, ControllerChangeEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'controller'; // delta time defaults to 0.
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.CONTROLLER_CHANGE_STATUS, fields.controllerNumber, fields.controllerValue);
+	});
+
+	/**
+	 * Object representation of a cue point meta event.
+	 * @param {object} fields {text: string, delta: integer}
+	 * @return {CuePointEvent}
+	 */
+
+	var CuePointEvent = /*#__PURE__*/_createClass(function CuePointEvent(fields) {
+	  _classCallCheck(this, CuePointEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'cue-point';
+	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_CUE_POINT, Utils.numberToVariableLength(textBytes.length), // Size
+	  textBytes // Text
+	  );
+	});
+
+	/**
+	 * Object representation of a end track meta event.
+	 * @param {object} fields {delta: integer}
+	 * @return {EndTrackEvent}
+	 */
+
+	var EndTrackEvent = /*#__PURE__*/_createClass(function EndTrackEvent(fields) {
+	  _classCallCheck(this, EndTrackEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'end-track'; // Start with zero time delta
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_END_OF_TRACK_ID);
+	});
+
+	/**
+	 * Object representation of an instrument name meta event.
+	 * @param {object} fields {text: string, delta: integer}
+	 * @return {InstrumentNameEvent}
+	 */
+
+	var InstrumentNameEvent = /*#__PURE__*/_createClass(function InstrumentNameEvent(fields) {
+	  _classCallCheck(this, InstrumentNameEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'instrument-name';
+	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_INSTRUMENT_NAME_ID, Utils.numberToVariableLength(textBytes.length), // Size
+	  textBytes // Instrument name
+	  );
+	});
+
+	/**
+	 * Object representation of a key signature meta event.
+	 * @return {KeySignatureEvent}
+	 */
+
+	var KeySignatureEvent = /*#__PURE__*/_createClass(function KeySignatureEvent(sf, mi) {
+	  _classCallCheck(this, KeySignatureEvent);
+
+	  this.type = 'key-signature';
+	  var mode = mi || 0;
+	  sf = sf || 0; //	Function called with string notation
+
+	  if (typeof mi === 'undefined') {
+	    var fifths = [['Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'], ['ab', 'eb', 'bb', 'f', 'c', 'g', 'd', 'a', 'e', 'b', 'f#', 'c#', 'g#', 'd#', 'a#']];
+	    var _sflen = sf.length;
+	    var note = sf || 'C';
+	    if (sf[0] === sf[0].toLowerCase()) mode = 1;
+
+	    if (_sflen > 1) {
+	      switch (sf.charAt(_sflen - 1)) {
+	        case 'm':
+	          mode = 1;
+	          note = sf.charAt(0).toLowerCase();
+	          note = note.concat(sf.substring(1, _sflen - 1));
+	          break;
+
+	        case '-':
+	          mode = 1;
+	          note = sf.charAt(0).toLowerCase();
+	          note = note.concat(sf.substring(1, _sflen - 1));
+	          break;
+
+	        case 'M':
+	          mode = 0;
+	          note = sf.charAt(0).toUpperCase();
+	          note = note.concat(sf.substring(1, _sflen - 1));
+	          break;
+
+	        case '+':
+	          mode = 0;
+	          note = sf.charAt(0).toUpperCase();
+	          note = note.concat(sf.substring(1, _sflen - 1));
+	          break;
+	      }
+	    }
+
+	    var fifthindex = fifths[mode].indexOf(note);
+	    sf = fifthindex === -1 ? 0 : fifthindex - 7;
+	  } // Start with zero time delta
+
+
+	  this.data = Utils.numberToVariableLength(0x00).concat(Constants.META_EVENT_ID, Constants.META_KEY_SIGNATURE_ID, [0x02], // Size
+	  Utils.numberToBytes(sf, 1), // Number of sharp or flats ( < 0 flat; > 0 sharp)
+	  Utils.numberToBytes(mode, 1) // Mode: 0 major, 1 minor
+	  );
+	});
+
+	/**
+	 * Object representation of a lyric meta event.
+	 * @param {object} fields {text: string, delta: integer}
+	 * @return {LyricEvent}
+	 */
+
+	var LyricEvent = /*#__PURE__*/_createClass(function LyricEvent(fields) {
+	  _classCallCheck(this, LyricEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'lyric';
+	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_LYRIC_ID, Utils.numberToVariableLength(textBytes.length), // Size
+	  textBytes // Text
+	  );
+	});
+
+	/**
+	 * Object representation of a marker meta event.
+	 * @param {object} fields {text: string, delta: integer}
+	 * @return {MarkerEvent}
+	 */
+
+	var MarkerEvent = /*#__PURE__*/_createClass(function MarkerEvent(fields) {
+	  _classCallCheck(this, MarkerEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'marker';
+	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_MARKER_ID, Utils.numberToVariableLength(textBytes.length), // Size
+	  textBytes // Text
+	  );
+	});
+
+	/**
 	 * Holds all data for a "note on" MIDI event
 	 * @param {object} fields {data: []}
 	 * @return {NoteOnEvent}
@@ -932,204 +1109,6 @@ var MidiWriter = (function () {
 	}();
 
 	/**
-	 * Holds all data for a "controller change" MIDI event
-	 * @param {object} fields {controllerNumber: integer, controllerValue: integer, delta: integer}
-	 * @return {ControllerChangeEvent}
-	 */
-
-	var ControllerChangeEvent = /*#__PURE__*/_createClass(function ControllerChangeEvent(fields) {
-	  _classCallCheck(this, ControllerChangeEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'controller'; // delta time defaults to 0.
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.CONTROLLER_CHANGE_STATUS, fields.controllerNumber, fields.controllerValue);
-	});
-
-	/**
-	 * Object representation of a tempo meta event.
-	 * @param {object} fields {text: string, delta: integer}
-	 * @return {CopyrightEvent}
-	 */
-
-	var CopyrightEvent = /*#__PURE__*/_createClass(function CopyrightEvent(fields) {
-	  _classCallCheck(this, CopyrightEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'copyright';
-	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_COPYRIGHT_ID, Utils.numberToVariableLength(textBytes.length), // Size
-	  textBytes // Text
-	  );
-	});
-
-	/**
-	 * Object representation of a cue point meta event.
-	 * @param {object} fields {text: string, delta: integer}
-	 * @return {CuePointEvent}
-	 */
-
-	var CuePointEvent = /*#__PURE__*/_createClass(function CuePointEvent(fields) {
-	  _classCallCheck(this, CuePointEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'cue-point';
-	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_CUE_POINT, Utils.numberToVariableLength(textBytes.length), // Size
-	  textBytes // Text
-	  );
-	});
-
-	/**
-	 * Object representation of a end track meta event.
-	 * @param {object} fields {delta: integer}
-	 * @return {EndTrackEvent}
-	 */
-
-	var EndTrackEvent = /*#__PURE__*/_createClass(function EndTrackEvent(fields) {
-	  _classCallCheck(this, EndTrackEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'end-track'; // Start with zero time delta
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_END_OF_TRACK_ID);
-	});
-
-	/**
-	 * Object representation of an instrument name meta event.
-	 * @param {object} fields {text: string, delta: integer}
-	 * @return {InstrumentNameEvent}
-	 */
-
-	var InstrumentNameEvent = /*#__PURE__*/_createClass(function InstrumentNameEvent(fields) {
-	  _classCallCheck(this, InstrumentNameEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'instrument-name';
-	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_INSTRUMENT_NAME_ID, Utils.numberToVariableLength(textBytes.length), // Size
-	  textBytes // Instrument name
-	  );
-	});
-
-	/**
-	 * Object representation of a key signature meta event.
-	 * @return {KeySignatureEvent}
-	 */
-
-	var KeySignatureEvent = /*#__PURE__*/_createClass(function KeySignatureEvent(sf, mi) {
-	  _classCallCheck(this, KeySignatureEvent);
-
-	  this.type = 'key-signature';
-	  var mode = mi || 0;
-	  sf = sf || 0; //	Function called with string notation
-
-	  if (typeof mi === 'undefined') {
-	    var fifths = [['Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'], ['ab', 'eb', 'bb', 'f', 'c', 'g', 'd', 'a', 'e', 'b', 'f#', 'c#', 'g#', 'd#', 'a#']];
-	    var _sflen = sf.length;
-	    var note = sf || 'C';
-	    if (sf[0] === sf[0].toLowerCase()) mode = 1;
-
-	    if (_sflen > 1) {
-	      switch (sf.charAt(_sflen - 1)) {
-	        case 'm':
-	          mode = 1;
-	          note = sf.charAt(0).toLowerCase();
-	          note = note.concat(sf.substring(1, _sflen - 1));
-	          break;
-
-	        case '-':
-	          mode = 1;
-	          note = sf.charAt(0).toLowerCase();
-	          note = note.concat(sf.substring(1, _sflen - 1));
-	          break;
-
-	        case 'M':
-	          mode = 0;
-	          note = sf.charAt(0).toUpperCase();
-	          note = note.concat(sf.substring(1, _sflen - 1));
-	          break;
-
-	        case '+':
-	          mode = 0;
-	          note = sf.charAt(0).toUpperCase();
-	          note = note.concat(sf.substring(1, _sflen - 1));
-	          break;
-	      }
-	    }
-
-	    var fifthindex = fifths[mode].indexOf(note);
-	    sf = fifthindex === -1 ? 0 : fifthindex - 7;
-	  } // Start with zero time delta
-
-
-	  this.data = Utils.numberToVariableLength(0x00).concat(Constants.META_EVENT_ID, Constants.META_KEY_SIGNATURE_ID, [0x02], // Size
-	  Utils.numberToBytes(sf, 1), // Number of sharp or flats ( < 0 flat; > 0 sharp)
-	  Utils.numberToBytes(mode, 1) // Mode: 0 major, 1 minor
-	  );
-	});
-
-	/**
-	 * Object representation of a lyric meta event.
-	 * @param {object} fields {text: string, delta: integer}
-	 * @return {LyricEvent}
-	 */
-
-	var LyricEvent = /*#__PURE__*/_createClass(function LyricEvent(fields) {
-	  _classCallCheck(this, LyricEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'lyric';
-	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_LYRIC_ID, Utils.numberToVariableLength(textBytes.length), // Size
-	  textBytes // Text
-	  );
-	});
-
-	/**
-	 * Object representation of a marker meta event.
-	 * @param {object} fields {text: string, delta: integer}
-	 * @return {MarkerEvent}
-	 */
-
-	var MarkerEvent = /*#__PURE__*/_createClass(function MarkerEvent(fields) {
-	  _classCallCheck(this, MarkerEvent);
-
-	  // Set default fields
-	  fields = Object.assign({
-	    delta: 0x00
-	  }, fields);
-	  this.type = 'marker';
-	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
-
-	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_MARKER_ID, Utils.numberToVariableLength(textBytes.length), // Size
-	  textBytes // Text
-	  );
-	});
-
-	/**
 	 * Object representation of a tempo meta event.
 	 * @param {object} fields {bpm: integer, delta: integer}
 	 * @return {TempoEvent}
@@ -1187,6 +1166,27 @@ var MidiWriter = (function () {
 	  Utils.numberToBytes(Math.log2(denominator), 1), // Denominator is expressed as pow of 2, 1 bytes
 	  Utils.numberToBytes(midiclockspertick || 24, 1), // MIDI Clocks per tick, 1 bytes
 	  Utils.numberToBytes(notespermidiclock || 8, 1) // Number of 1/32 notes per MIDI clocks, 1 bytes
+	  );
+	});
+
+	/**
+	 * Object representation of a tempo meta event.
+	 * @param {object} fields {text: string, delta: integer}
+	 * @return {CopyrightEvent}
+	 */
+
+	var CopyrightEvent = /*#__PURE__*/_createClass(function CopyrightEvent(fields) {
+	  _classCallCheck(this, CopyrightEvent);
+
+	  // Set default fields
+	  fields = Object.assign({
+	    delta: 0x00
+	  }, fields);
+	  this.type = 'copyright';
+	  var textBytes = Utils.stringToBytes(fields.text); // Start with zero time delta
+
+	  this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, Constants.META_COPYRIGHT_ID, Utils.numberToVariableLength(textBytes.length), // Size
+	  textBytes // Text
 	  );
 	});
 
@@ -1841,12 +1841,23 @@ var MidiWriter = (function () {
 
 	var main = {
 	  Constants: Constants,
+	  ControllerChangeEvent: ControllerChangeEvent,
+	  CuePointEvent: CuePointEvent,
+	  EndTrackEvent: EndTrackEvent,
+	  InstrumentNameEvent: InstrumentNameEvent,
+	  KeySignatureEvent: KeySignatureEvent,
+	  LyricEvent: LyricEvent,
+	  MarkerEvent: MarkerEvent,
 	  NoteOnEvent: NoteOnEvent,
 	  NoteOffEvent: NoteOffEvent,
 	  NoteEvent: NoteEvent,
 	  PitchBendEvent: PitchBendEvent,
 	  ProgramChangeEvent: ProgramChangeEvent,
+	  TempoEvent: TempoEvent,
+	  TextEvent: TextEvent,
+	  TimeSignatureEvent: TimeSignatureEvent,
 	  Track: Track,
+	  TrackNameEvent: TrackNameEvent,
 	  Utils: Utils,
 	  VexFlow: VexFlow,
 	  Writer: Writer
