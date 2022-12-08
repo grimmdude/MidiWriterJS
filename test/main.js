@@ -214,6 +214,18 @@ describe('MidiWriterJS', function() {
 
 			assert.equal(JSON.stringify(bar2note, null, 2), JSON.stringify(bar2note2, null, 2));
 		})
+
+		it('should return specific base64 string when manually adding EndTrackEvent', function() {
+			const track = new MidiWriter.Track();
+
+			track.addEvent([
+				new MidiWriter.NoteEvent({pitch: ['C5', 'E5', 'G4'], duration: '4'}),
+				new MidiWriter.EndTrackEvent({delta: 5000}),
+			]);
+
+			const write = new MidiWriter.Writer(track);
+			assert.equal('TVRoZAAAAAYAAAABAIBNVHJrAAAAHgCQSEAAkExAAJBDQIEAgEhAAIBMQACAQ0CnCP8vAA==', write.base64());
+		})
 	});
 
 	describe('#Utils()', function() {

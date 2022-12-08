@@ -6,7 +6,7 @@ var MidiWriter = (function () {
 	 * @return {Constants}
 	 */
 	var Constants = {
-	  VERSION: '2.1.3',
+	  VERSION: '2.1.4',
 	  HEADER_CHUNK_TYPE: [0x4d, 0x54, 0x68, 0x64],
 	  // Mthd
 	  HEADER_CHUNK_LENGTH: [0x00, 0x00, 0x00, 0x06],
@@ -1283,6 +1283,12 @@ var MidiWriter = (function () {
 	              return _this.events.push(e);
 	            });
 	          }
+	        } else if (event instanceof EndTrackEvent) {
+	          // Only one EndTrackEvent is allowed, so remove
+	          // any existing ones before adding.
+	          _this.removeEventsByType('end-track');
+
+	          _this.events.push(event);
 	        } else {
 	          _this.events.push(event);
 	        }
@@ -1301,9 +1307,12 @@ var MidiWriter = (function () {
 	      var _this2 = this;
 
 	      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-	      // Remove existing end track event and add one.
-	      // This makes sure it's at the very end of the event list.
-	      this.removeEventsByType('end-track').addEvent(new EndTrackEvent()); // Reset
+
+	      // If the last event isn't EndTrackEvent, then tack it onto the data.
+	      if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
+	        this.addEvent(new EndTrackEvent());
+	      } // Reset
+
 
 	      this.data = [];
 	      this.size = [];
@@ -1384,8 +1393,14 @@ var MidiWriter = (function () {
 	  }, {
 	    key: "mergeSingleEvent",
 	    value: function mergeSingleEvent(event) {
-	      // Find index of existing event we need to follow with
-	      var lastEventIndex = 0;
+	      // There are no events yet, so just add it in.
+	      if (!this.events.length) {
+	        this.addEvent(event);
+	        return;
+	      } // Find index of existing event we need to follow with
+
+
+	      var lastEventIndex;
 
 	      for (var i = 0; i < this.events.length; i++) {
 	        if (this.events[i].tick > event.tick) break;

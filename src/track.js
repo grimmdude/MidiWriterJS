@@ -79,6 +79,12 @@ class Track {
 					event.buildData().events.forEach((e) => this.events.push(e));
 				}
 
+			} else if (event instanceof EndTrackEvent) {
+				// Only one EndTrackEvent is allowed, so remove
+				// any existing ones before adding.
+				this.removeEventsByType('end-track');
+				this.events.push(event);
+
 			} else {
 				this.events.push(event);
 			}
@@ -93,9 +99,10 @@ class Track {
 	 * @return {Track}
 	 */
 	buildData(options = {}) {
-		// Remove existing end track event and add one.
-		// This makes sure it's at the very end of the event list.
-		this.removeEventsByType('end-track').addEvent(new EndTrackEvent());
+		// If the last event isn't EndTrackEvent, then tack it onto the data.
+		if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
+			this.addEvent(new EndTrackEvent());
+		}
 
 		// Reset
 		this.data = [];
@@ -170,8 +177,14 @@ class Track {
 	 * @return {Track}
 	 */
 	mergeSingleEvent(event) {
+		// There are no events yet, so just add it in.
+		if (!this.events.length) {
+			this.addEvent(event);
+			return;
+		}
+
 		// Find index of existing event we need to follow with
-		var lastEventIndex = 0;
+		let lastEventIndex;
 
 		for (let i = 0; i < this.events.length; i++) {
 			if (this.events[i].tick > event.tick) break;
