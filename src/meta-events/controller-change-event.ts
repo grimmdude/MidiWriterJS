@@ -6,8 +6,13 @@ import {Utils} from '../utils.js';
  * @param {object} fields {controllerNumber: integer, controllerValue: integer, delta: integer}
  * @return {ControllerChangeEvent}
  */
-class ControllerChangeEvent {
-	constructor(fields) {
+class ControllerChangeEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
+	constructor(fields: { controllerNumber: number; controllerValue: number; delta: number; }) {
 		// Set default fields
 		fields = Object.assign({
 			delta: 0x00,

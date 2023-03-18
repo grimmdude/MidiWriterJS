@@ -5,7 +5,12 @@ import {Utils} from '../utils';
  * Object representation of a key signature meta event.
  * @return {KeySignatureEvent}
  */
-class KeySignatureEvent {
+class KeySignatureEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
 	constructor(sf, mi) {
 		this.type = 'key-signature';
 

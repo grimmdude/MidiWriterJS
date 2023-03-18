@@ -10,7 +10,7 @@ class Utils {
 	 * Gets MidiWriterJS version number.
 	 * @return {string}
 	 */
-	static version() {
+	static version(): string {
 		return Constants.VERSION;
 	}
 
@@ -19,8 +19,8 @@ class Utils {
 	 * @param {string} string
 	 * @return {array}
 	 */
-	static stringToBytes(string) {
-		return string.split('').map(char => char.charCodeAt())
+	static stringToBytes(string: string): number[] {
+		return string.split('').map(char => char.charCodeAt(0))
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Utils {
 	 * @param {*} n - Value to check
 	 * @return {boolean}
 	 */
-	static isNumeric(n) {
+	static isNumeric(n: any): boolean {
 		return !isNaN(parseFloat(n)) && isFinite(n)
 	}
 
@@ -39,7 +39,7 @@ class Utils {
 	 * @param {string} middleC
 	 * @return {number}
 	 */
-	static getPitch(pitch, middleC = 'C4') {
+	static getPitch(pitch: (string | number), middleC: string = 'C4'): number {
 		return 60 - toMidi(middleC) + toMidi(pitch);
 	}
 

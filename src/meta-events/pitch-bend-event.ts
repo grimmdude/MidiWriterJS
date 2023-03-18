@@ -15,7 +15,12 @@ const scale14bits = (zeroOne) => {
     return Math.floor( 16383 * ( zeroOne + 1 ) / 2 );
 }
 
-class PitchBendEvent {
+class PitchBendEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+	
     constructor(fields) {
         // Set default fields
 		fields = Object.assign({

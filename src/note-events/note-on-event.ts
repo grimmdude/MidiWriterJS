@@ -5,7 +5,12 @@ import {Utils} from '../utils';
  * @param {object} fields {data: []}
  * @return {NoteOnEvent}
  */
-class NoteOnEvent {
+class NoteOnEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
 	constructor(fields) {
 		// Set default fields
 		fields = Object.assign({

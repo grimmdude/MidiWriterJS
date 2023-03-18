@@ -6,7 +6,12 @@ import {Utils} from '../utils';
  * @param {object} fields {bpm: integer, delta: integer}
  * @return {TempoEvent}
  */
-class TempoEvent {
+class TempoEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+	
 	constructor(fields) {
 		// Set default fields
 		fields = Object.assign({

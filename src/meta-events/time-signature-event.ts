@@ -5,7 +5,12 @@ import {Utils} from '../utils';
  * Object representation of a time signature meta event.
  * @return {TimeSignatureEvent}
  */
-class TimeSignatureEvent {
+class TimeSignatureEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
 	constructor(numerator, denominator, midiclockspertick, notespermidiclock) {
 		this.type = 'time-signature';
 

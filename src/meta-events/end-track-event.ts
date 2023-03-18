@@ -6,8 +6,13 @@ import {Utils} from '../utils';
  * @param {object} fields {delta: integer}
  * @return {EndTrackEvent}
  */
-class EndTrackEvent {
-	constructor(fields) {
+class EndTrackEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
+	constructor(fields?) {
 		// Set default fields
 		fields = Object.assign({
 			delta: 0x00,

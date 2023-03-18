@@ -5,7 +5,12 @@ import {Utils} from '../utils';
  * @param {object} fields {instrument: integer, delta: integer}
  * @return {ProgramChangeEvent}
  */
-class ProgramChangeEvent {
+class ProgramChangeEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
 	constructor(fields) {
 		// Set default fields
 		this.fields = Object.assign({

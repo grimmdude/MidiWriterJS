@@ -2,29 +2,34 @@ import {Constants} from '../constants';
 import {Utils} from '../utils';
 
 /**
- * Object representation of an instrument name meta event.
+ * Object representation of a marker meta event.
  * @param {object} fields {text: string, delta: integer}
- * @return {InstrumentNameEvent}
+ * @return {MarkerEvent}
  */
-class InstrumentNameEvent {
+class MarkerEvent implements AbstractEvent {
+	data: number[];
+    delta: number;
+    tick: number;
+    type: string;
+
 	constructor(fields) {
 		// Set default fields
 		fields = Object.assign({
 			delta: 0x00,
 		}, fields);
 
-		this.type = 'instrument-name';
+		this.type = 'marker';
 
 		const textBytes = Utils.stringToBytes(fields.text);
 
 		// Start with zero time delta
 		this.data = Utils.numberToVariableLength(fields.delta).concat(
 			Constants.META_EVENT_ID,
-			Constants.META_INSTRUMENT_NAME_ID,
+			Constants.META_MARKER_ID,
 			Utils.numberToVariableLength(textBytes.length), // Size
-			textBytes, // Instrument name
+			textBytes, // Text
 		);
 	}
 }
 
-export {InstrumentNameEvent};
+export {MarkerEvent};

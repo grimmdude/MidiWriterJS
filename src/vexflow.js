@@ -1,5 +1,5 @@
 import {NoteEvent} from './note-events/note-event';
-import {Track} from './track';
+import {Track} from './track.ts';
 
 class VexFlow {
 

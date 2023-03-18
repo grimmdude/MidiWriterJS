@@ -14,7 +14,7 @@ import {ProgramChangeEvent} from './meta-events/program-change-event.js';
 import {TempoEvent} from './meta-events/tempo-event.js';
 import {TextEvent} from './meta-events/text-event.js';
 import {TimeSignatureEvent} from './meta-events/time-signature-event.js';
-import {Track} from './track.js';
+import {Track} from './track';
 import {TrackNameEvent} from './meta-events/track-name-event.js';
 import {Utils} from './utils.js';
 import {VexFlow} from './vexflow.js';

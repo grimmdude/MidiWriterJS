@@ -23,6 +23,13 @@ import {Utils} from './utils';
  * @return {Track}
  */
 class Track {
+	type: number[];
+	data: number[];
+	size: number[];
+	events: any[];
+	explicitTickEvents: any[];
+	tickPointer: number;
+
 	constructor() {
 		this.type = Constants.TRACK_CHUNK_TYPE;
 		this.data = [];
@@ -39,11 +46,11 @@ class Track {
 	 * Adds any event type to the track.
 	 * Events without a specific startTick property are assumed to be added in order of how they should output.
 	 * Events with a specific startTick property are set aside for now will be merged in during build process.
-	 * @param {(NoteEvent|ProgramChangeEvent)} events - Event object or array of Event objects.
-	 * @param {function} mapFunction - Callback which can be used to apply specific properties to all events.
+	 * @param {AbstractEvent[]} events - Event object or array of Event objects.
+	 * @param {Function} mapFunction - Callback which can be used to apply specific properties to all events.
 	 * @return {Track}
 	 */
-	addEvent(events, mapFunction) {
+	addEvent(events: (AbstractEvent|AbstractEvent[]), mapFunction?: Function): Track {
 		Utils.toArray(events).forEach((event, i) => {
 			if (event instanceof NoteEvent) {
 				// Handle map function if provided
@@ -98,10 +105,10 @@ class Track {
 	 * @param {object} options
 	 * @return {Track}
 	 */
-	buildData(options = {}) {
+	buildData(options: object = {}): Track {
 		// If the last event isn't EndTrackEvent, then tack it onto the data.
 		if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
-			this.addEvent(new EndTrackEvent());
+			this.addEvent(new EndTrackEvent);
 		}
 
 		// Reset
@@ -163,7 +170,7 @@ class Track {
 	 * @param {Track} track
 	 * @return {Track}
 	 */
-	mergeTrack(track) {
+	mergeTrack(track: Track): Track {
 		// First build this track to populate each event's tick property
 		this.buildData();
 
@@ -176,7 +183,7 @@ class Track {
 	 * @param {NoteOnEvent|NoteOffEvent} - event
 	 * @return {Track}
 	 */
-	mergeSingleEvent(event) {
+	mergeSingleEvent(event: AbstractEvent): Track {
 		// There are no events yet, so just add it in.
 		if (!this.events.length) {
 			this.addEvent(event);
@@ -228,7 +235,7 @@ class Track {
 	 * @param {number} tick - Start tick.
 	 * @return {Track}
 	 */
-	setTempo(bpm, tick = 0) {
+	setTempo(bpm: number, tick: number): Track {
 		return this.addEvent(new TempoEvent({bpm, tick}));
 	}
 
@@ -240,7 +247,7 @@ class Track {
 	 * @param {number} notespermidiclock - Defaults to 8.
 	 * @return {Track}
 	 */
-	setTimeSignature(numerator, denominator, midiclockspertick, notespermidiclock) {
+	setTimeSignature(numerator: number, denominator: number, midiclockspertick: number, notespermidiclock: number): Track {
 		return this.addEvent(new TimeSignatureEvent(numerator, denominator, midiclockspertick, notespermidiclock));
 	}
 
@@ -259,7 +266,7 @@ class Track {
 	 * @param {string} text - Text to add.
 	 * @return {Track}
 	 */
-	addText(text) {
+	addText(text: string): Track {
 		return this.addEvent(new TextEvent({text}));
 	}
 
@@ -268,7 +275,7 @@ class Track {
 	 * @param {string} text - Text of copyright line.
 	 * @return {Track}
 	 */
-	addCopyright(text) {
+	addCopyright(text: string): Track {
 		return this.addEvent(new CopyrightEvent({text}));
 	}
 
@@ -277,7 +284,7 @@ class Track {
 	 * @param {string} text - Text of track name.
 	 * @return {Track}
 	 */
-	addTrackName(text) {
+	addTrackName(text: string): Track {
 		return this.addEvent(new TrackNameEvent({text}));
 	}
 
@@ -286,7 +293,7 @@ class Track {
 	 * @param {string} text - Name of instrument.
 	 * @return {Track}
 	 */
-	addInstrumentName(text) {
+	addInstrumentName(text: string): Track {
 		return this.addEvent(new InstrumentNameEvent({text}));
 	}
 
@@ -295,7 +302,7 @@ class Track {
 	 * @param {string} text - Marker text.
 	 * @return {Track}
 	 */
-	addMarker(text) {
+	addMarker(text: string): Track {
 		return this.addEvent(new MarkerEvent({text}));
 	}
 
@@ -304,7 +311,7 @@ class Track {
 	 * @param {string} text - Text of cue point.
 	 * @return {Track}
 	 */
-	addCuePoint(text) {
+	addCuePoint(text: string): Track {
 		return this.addEvent(new CuePointEvent({text}));
 	}
 
@@ -313,7 +320,7 @@ class Track {
 	 * @param {string} text - Lyric text to add.
 	 * @return {Track}
 	 */
-	addLyric(text) {
+	addLyric(text: string): Track {
 		return this.addEvent(new LyricEvent({text}));
 	}
 
@@ -321,7 +328,7 @@ class Track {
 	 * Channel mode messages
 	 * @return {Track}
 	 */
-	polyModeOn() {
+	polyModeOn(): Track {
 		const event = new NoteOnEvent({data: [0x00, 0xB0, 0x7E, 0x00]});
 		return this.addEvent(event);
 	}
@@ -332,7 +339,7 @@ class Track {
 	 * @param {float} bend - Bend value ranging [-1,1], zero meaning no bend.
 	 * @return {Track}
 	 */
-	setPitchBend(bend) {
+	setPitchBend(bend: number): Track {
 		return this.addEvent(new PitchBendEvent({bend}));
 	}
 
@@ -343,7 +350,7 @@ class Track {
 	 * @param {number} value - Control value.
 	 * @return {Track}
 	 */
-	controllerChange(number, value) {
+	controllerChange(number: number, value: number): Track {
 		return this.addEvent(new ControllerChangeEvent({controllerNumber: number, controllerValue: value}));
 	}
 
