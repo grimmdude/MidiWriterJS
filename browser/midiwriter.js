@@ -708,6 +708,7 @@ var MidiWriter = (function () {
             this.pitch = fields.pitch;
             this.wait = fields.wait || 0;
             this.velocity = fields.velocity || 50;
+            this.middleC = fields.middleC;
             this.tick = fields.tick || null;
             this.delta = null;
             this.data = fields.data;
@@ -717,8 +718,7 @@ var MidiWriter = (function () {
          * @param {Track} track - parent track
          * @return {NoteOnEvent}
          */
-        NoteOnEvent.prototype.buildData = function (track, precisionDelta, options) {
-            if (options === void 0) { options = {}; }
+        NoteOnEvent.prototype.buildData = function (track, precisionDelta) {
             this.data = [];
             // Explicitly defined startTick event
             if (this.tick) {
@@ -734,7 +734,7 @@ var MidiWriter = (function () {
             }
             this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
             this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
-                .concat(this.status, Utils.getPitch(this.pitch, options.middleC), Utils.convertVelocity(this.velocity));
+                .concat(this.status, Utils.getPitch(this.pitch, this.middleC), Utils.convertVelocity(this.velocity));
             return this;
         };
         Object.defineProperty(NoteOnEvent.prototype, "name", {
@@ -767,20 +767,20 @@ var MidiWriter = (function () {
             this.tick = fields.tick || null;
             this.data = fields.data;
             this.delta = fields.delta || Utils.getTickDuration(fields.duration);
+            this.middleC = fields.middleC;
         }
         /**
          * Builds int array for this event.
          * @param {Track} track - parent track
          * @return {NoteOffEvent}
          */
-        NoteOffEvent.prototype.buildData = function (track, precisionDelta, options) {
-            if (options === void 0) { options = {}; }
+        NoteOffEvent.prototype.buildData = function (track, precisionDelta) {
             if (this.tick === null) {
                 this.tick = Utils.getRoundedIfClose(this.delta + track.tickPointer);
             }
             this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
             this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
-                .concat(this.status, Utils.getPitch(this.pitch, options.middleC), Utils.convertVelocity(this.velocity));
+                .concat(this.status, Utils.getPitch(this.pitch, this.middleC), Utils.convertVelocity(this.velocity));
             return this;
         };
         Object.defineProperty(NoteOffEvent.prototype, "name", {
@@ -817,6 +817,7 @@ var MidiWriter = (function () {
             this.tick = fields.startTick || fields.tick || null;
             this.velocity = fields.velocity || 50;
             this.wait = fields.wait || 0;
+            this.middleC = fields.middleC;
             this.tickDuration = Utils.getTickDuration(this.duration);
             this.restDuration = Utils.getTickDuration(this.wait);
         }
@@ -862,6 +863,7 @@ var MidiWriter = (function () {
                                     velocity: _this.velocity,
                                     pitch: p,
                                     tick: _this.tick,
+                                    middleC: _this.middleC,
                                 });
                             }
                             else {
@@ -874,6 +876,7 @@ var MidiWriter = (function () {
                                     velocity: _this.velocity,
                                     pitch: p,
                                     tick: _this.tick,
+                                    middleC: _this.middleC,
                                 });
                             }
                             events.push(noteOnNew);
@@ -889,6 +892,7 @@ var MidiWriter = (function () {
                                     velocity: _this.velocity,
                                     pitch: p,
                                     tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
+                                    middleC: _this.middleC,
                                 });
                             }
                             else {
@@ -900,6 +904,7 @@ var MidiWriter = (function () {
                                     velocity: _this.velocity,
                                     pitch: p,
                                     tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
+                                    middleC: _this.middleC,
                                 });
                             }
                             events.push(noteOffNew);
@@ -917,12 +922,14 @@ var MidiWriter = (function () {
                                 velocity: _this.velocity,
                                 pitch: p,
                                 tick: _this.tick,
+                                middleC: _this.middleC,
                             });
                             var noteOffNew = new NoteOffEvent({
                                 channel: _this.channel,
                                 duration: _this.duration,
                                 velocity: _this.velocity,
                                 pitch: p,
+                                middleC: _this.middleC,
                             });
                             events.push(noteOnNew, noteOffNew);
                         });
@@ -1225,7 +1232,9 @@ var MidiWriter = (function () {
             this.events.forEach(function (event) {
                 // Build event & add to total tick duration
                 if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
-                    var built = event.buildData(_this, precisionLoss, options);
+                    // Set middleC if override in options
+                    event.middleC = options.middleC;
+                    var built = event.buildData(_this, precisionLoss);
                     precisionLoss = Utils.getPrecisionLoss(event.deltaWithPrecisionCorrection || 0);
                     _this.data = _this.data.concat(built.data);
                     _this.tickPointer = Utils.getRoundedIfClose(event.tick);
@@ -1559,7 +1568,7 @@ var MidiWriter = (function () {
             this.options = options;
         }
         /**
-         * Builds array of data from chunkschunks.
+         * Builds array of data from chunks.
          * @return {array}
          */
         Writer.prototype.buildData = function () {

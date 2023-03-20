@@ -15,12 +15,14 @@ class NoteOnEvent implements MidiEvent {
 	wait: string|number;
 	tick: number;
 	deltaWithPrecisionCorrection: number;
+	middleC: string;
 
-	constructor(fields: { channel?: number; wait?: string|number; velocity?: number; pitch?: string|string[]|number|number[]; tick?: number; data?: number[]; delta?: number }) {
+	constructor(fields: { channel?: number; wait?: string|number; velocity?: number; pitch?: string|string[]|number|number[]; tick?: number; data?: number[]; delta?: number, middleC?: string }) {
 		this.channel = fields.channel || 1;
 		this.pitch = fields.pitch;
 		this.wait = fields.wait || 0;
 		this.velocity = fields.velocity || 50;
+		this.middleC = fields.middleC;
 
 		this.tick = fields.tick || null;
 		this.delta = null;
@@ -32,7 +34,7 @@ class NoteOnEvent implements MidiEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOnEvent}
 	 */
-	buildData(track, precisionDelta, options: {middleC?: string} = {}) {
+	buildData(track, precisionDelta) {
 		this.data = [];
 
 		// Explicitly defined startTick event
@@ -54,7 +56,7 @@ class NoteOnEvent implements MidiEvent {
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
 						this.status,
-						Utils.getPitch(this.pitch, options.middleC),
+						Utils.getPitch(this.pitch, this.middleC),
 						Utils.convertVelocity(this.velocity)
 					);
 

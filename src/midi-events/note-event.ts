@@ -23,6 +23,7 @@ class NoteEvent implements AbstractEvent {
 	velocity: number;
 	tickDuration: number;
 	restDuration: number;
+	middleC: string;
 
 	constructor(fields) {
 		this.data = [];
@@ -36,6 +37,7 @@ class NoteEvent implements AbstractEvent {
 		this.tick = fields.startTick || fields.tick || null;
 		this.velocity = fields.velocity || 50;
 		this.wait = fields.wait || 0;
+		this.middleC = fields.middleC;
 
 		this.tickDuration = Utils.getTickDuration(this.duration);
 		this.restDuration = Utils.getTickDuration(this.wait);
@@ -85,6 +87,7 @@ class NoteEvent implements AbstractEvent {
 							velocity: this.velocity,
 							pitch: p,
 							tick: this.tick,
+							middleC: this.middleC,
 						});
 
 					} else {
@@ -97,6 +100,7 @@ class NoteEvent implements AbstractEvent {
 							velocity: this.velocity,
 							pitch: p,
 							tick: this.tick,
+							middleC: this.middleC,
 						});
 					}
 
@@ -115,6 +119,7 @@ class NoteEvent implements AbstractEvent {
 							velocity: this.velocity,
 							pitch: p,
 							tick: this.tick !== null ? Utils.getTickDuration(this.duration) + this.tick : null,
+							middleC: this.middleC,
 						});
 
 					} else {
@@ -126,6 +131,7 @@ class NoteEvent implements AbstractEvent {
 							velocity: this.velocity,
 							pitch: p,
 							tick: this.tick !== null ? Utils.getTickDuration(this.duration) + this.tick : null,
+							middleC: this.middleC,
 						});
 					}
 
@@ -144,6 +150,7 @@ class NoteEvent implements AbstractEvent {
 						velocity: this.velocity,
 						pitch: p,
 						tick: this.tick,
+						middleC: this.middleC,
 					});
 
 					const noteOffNew = new NoteOffEvent({
@@ -151,6 +158,7 @@ class NoteEvent implements AbstractEvent {
 						duration: this.duration,
 						velocity: this.velocity,
 						pitch: p,
+						middleC: this.middleC,
 					});
 
 					events.push(noteOnNew, noteOffNew);

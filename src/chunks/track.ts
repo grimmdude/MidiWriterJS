@@ -88,7 +88,7 @@ class Track implements Chunk {
 	 * @param {object} options
 	 * @return {Track}
 	 */
-	buildData(options = {}) {
+	buildData(options: {middleC?: string} = {}) {
 		// Reset
 		this.data = [];
 		this.size = [];
@@ -99,7 +99,10 @@ class Track implements Chunk {
 		this.events.forEach((event) => {
 			// Build event & add to total tick duration
 			if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
-				const built = event.buildData(this, precisionLoss, options);
+				// Set middleC if override in options
+				event.middleC = options.middleC;
+
+				const built = event.buildData(this, precisionLoss);
 				precisionLoss = Utils.getPrecisionLoss(event.deltaWithPrecisionCorrection || 0);
 				this.data = this.data.concat(built.data);
 				this.tickPointer = Utils.getRoundedIfClose(event.tick);
