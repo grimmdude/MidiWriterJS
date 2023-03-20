@@ -819,116 +819,120 @@ var MidiWriter = (function () {
             this.wait = fields.wait || 0;
             this.tickDuration = Utils.getTickDuration(this.duration);
             this.restDuration = Utils.getTickDuration(this.wait);
-            this.events = []; // Hold actual NoteOn/NoteOff events
         }
-        /**
-         * Builds array of NoteOnEvent & NoteOffEvent
-         * @return {NoteEvent}
-         */
-        NoteEvent.prototype.buildData = function () {
-            /*
-            // this.data isn't currently being used in this class.
-
-            // Reset data array
-            this.data = [];
-
-            // Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
-            if (this.grace) {
-                const graceDuration = 1;
-                this.grace = Utils.toArray(this.grace);
-                this.grace.forEach(() => {
-                    const noteEvent = new NoteEvent({pitch: this.grace, duration:'T' + graceDuration});
-                    this.data = this.data.concat(noteEvent.data);
-                });
-            }
-            */
-            var _this = this;
-            // fields.pitch could be an array of pitches.
-            // If so create note events for each and apply the same duration.
-            // By default this is a chord if it's an array of notes that requires one NoteOnEvent.
-            // If this.sequential === true then it's a sequential string of notes that requires separate NoteOnEvents.
-            if (!this.sequential) {
-                // Handle repeat
-                for (var j = 0; j < this.repeat; j++) {
-                    // Note on
-                    this.pitch.forEach(function (p, i) {
-                        var noteOnNew;
-                        if (i == 0) {
-                            noteOnNew = new NoteOnEvent({
-                                channel: _this.channel,
-                                wait: _this.wait,
-                                delta: Utils.getTickDuration(_this.wait),
-                                velocity: _this.velocity,
-                                pitch: p,
-                                tick: _this.tick,
-                            });
-                        }
-                        else {
-                            // Running status (can omit the note on status)
-                            //noteOn = new NoteOnEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
-                            noteOnNew = new NoteOnEvent({
-                                channel: _this.channel,
-                                wait: 0,
-                                delta: 0,
-                                velocity: _this.velocity,
-                                pitch: p,
-                                tick: _this.tick,
-                            });
-                        }
-                        _this.events.push(noteOnNew);
+        Object.defineProperty(NoteEvent.prototype, "events", {
+            /**
+             * Gets array of NoteOnEvent & NoteOffEvents
+             * @return {NoteEvent}
+             */
+            get: function () {
+                var _this = this;
+                var events = [];
+                /*
+                // this.data isn't currently being used in this class.
+        
+                // Reset data array
+                this.data = [];
+        
+                // Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
+                if (this.grace) {
+                    const graceDuration = 1;
+                    this.grace = Utils.toArray(this.grace);
+                    this.grace.forEach(() => {
+                        const noteEvent = new NoteEvent({pitch: this.grace, duration:'T' + graceDuration});
+                        this.data = this.data.concat(noteEvent.data);
                     });
-                    // Note off
-                    this.pitch.forEach(function (p, i) {
-                        var noteOffNew;
-                        if (i == 0) {
-                            //noteOff = new NoteOffEvent({data: Utils.numberToVariableLength(tickDuration).concat(this.getNoteOffStatus(), Utils.getPitch(p), Utils.convertVelocity(this.velocity))});
-                            noteOffNew = new NoteOffEvent({
+                }
+                */
+                // fields.pitch could be an array of pitches.
+                // If so create note events for each and apply the same duration.
+                // By default this is a chord if it's an array of notes that requires one NoteOnEvent.
+                // If this.sequential === true then it's a sequential string of notes that requires separate NoteOnEvents.
+                if (!this.sequential) {
+                    // Handle repeat
+                    for (var j = 0; j < this.repeat; j++) {
+                        // Note on
+                        this.pitch.forEach(function (p, i) {
+                            var noteOnNew;
+                            if (i == 0) {
+                                noteOnNew = new NoteOnEvent({
+                                    channel: _this.channel,
+                                    wait: _this.wait,
+                                    delta: Utils.getTickDuration(_this.wait),
+                                    velocity: _this.velocity,
+                                    pitch: p,
+                                    tick: _this.tick,
+                                });
+                            }
+                            else {
+                                // Running status (can omit the note on status)
+                                //noteOn = new NoteOnEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
+                                noteOnNew = new NoteOnEvent({
+                                    channel: _this.channel,
+                                    wait: 0,
+                                    delta: 0,
+                                    velocity: _this.velocity,
+                                    pitch: p,
+                                    tick: _this.tick,
+                                });
+                            }
+                            events.push(noteOnNew);
+                        });
+                        // Note off
+                        this.pitch.forEach(function (p, i) {
+                            var noteOffNew;
+                            if (i == 0) {
+                                //noteOff = new NoteOffEvent({data: Utils.numberToVariableLength(tickDuration).concat(this.getNoteOffStatus(), Utils.getPitch(p), Utils.convertVelocity(this.velocity))});
+                                noteOffNew = new NoteOffEvent({
+                                    channel: _this.channel,
+                                    duration: _this.duration,
+                                    velocity: _this.velocity,
+                                    pitch: p,
+                                    tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
+                                });
+                            }
+                            else {
+                                // Running status (can omit the note off status)
+                                //noteOff = new NoteOffEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
+                                noteOffNew = new NoteOffEvent({
+                                    channel: _this.channel,
+                                    duration: 0,
+                                    velocity: _this.velocity,
+                                    pitch: p,
+                                    tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
+                                });
+                            }
+                            events.push(noteOffNew);
+                        });
+                    }
+                }
+                else {
+                    // Handle repeat
+                    for (var j = 0; j < this.repeat; j++) {
+                        this.pitch.forEach(function (p, i) {
+                            var noteOnNew = new NoteOnEvent({
+                                channel: _this.channel,
+                                wait: (i > 0 ? 0 : _this.wait),
+                                delta: (i > 0 ? 0 : Utils.getTickDuration(_this.wait)),
+                                velocity: _this.velocity,
+                                pitch: p,
+                                tick: _this.tick,
+                            });
+                            var noteOffNew = new NoteOffEvent({
                                 channel: _this.channel,
                                 duration: _this.duration,
                                 velocity: _this.velocity,
                                 pitch: p,
-                                tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
                             });
-                        }
-                        else {
-                            // Running status (can omit the note off status)
-                            //noteOff = new NoteOffEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
-                            noteOffNew = new NoteOffEvent({
-                                channel: _this.channel,
-                                duration: 0,
-                                velocity: _this.velocity,
-                                pitch: p,
-                                tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
-                            });
-                        }
-                        _this.events.push(noteOffNew);
-                    });
-                }
-            }
-            else {
-                // Handle repeat
-                for (var j = 0; j < this.repeat; j++) {
-                    this.pitch.forEach(function (p, i) {
-                        var noteOnNew = new NoteOnEvent({
-                            channel: _this.channel,
-                            wait: (i > 0 ? 0 : _this.wait),
-                            delta: (i > 0 ? 0 : Utils.getTickDuration(_this.wait)),
-                            velocity: _this.velocity,
-                            pitch: p,
-                            tick: _this.tick,
+                            events.push(noteOnNew, noteOffNew);
                         });
-                        var noteOffNew = new NoteOffEvent({
-                            channel: _this.channel,
-                            duration: _this.duration,
-                            velocity: _this.velocity,
-                            pitch: p,
-                        });
-                        _this.events.push(noteOnNew, noteOffNew);
-                    });
+                    }
                 }
-            }
-            return this;
-        };
+                return events;
+            },
+            enumerable: false,
+            configurable: true
+        });
         Object.defineProperty(NoteEvent.prototype, "name", {
             get: function () {
                 return 'NoteEvent';
@@ -1196,7 +1200,7 @@ var MidiWriter = (function () {
                     }
                     else {
                         // Push each on/off event to track's event stack
-                        event.buildData().events.forEach(function (e) { return _this.events.push(e); });
+                        event.events.forEach(function (e) { return _this.events.push(e); });
                     }
                 }
                 else {
@@ -1255,7 +1259,7 @@ var MidiWriter = (function () {
                 // Convert NoteEvent to it's respective NoteOn/NoteOff events
                 // Note that as we splice in events the delta for the NoteOff ones will
                 // Need to change based on what comes before them after the splice.
-                noteEvent.buildData().events.forEach(function (e) { return e.buildData(_this); });
+                noteEvent.events.forEach(function (e) { return e.buildData(_this); });
                 // Merge each event individually into this track's event list.
                 noteEvent.events.forEach(function (event) { return _this.mergeSingleEvent(event); });
             });

@@ -72,7 +72,7 @@ class Track implements Chunk {
 
 				} else {
 					// Push each on/off event to track's event stack
-					event.buildData().events.forEach((e) => this.events.push(e));
+					event.events.forEach((e) => this.events.push(e));
 				}
 
 			} else {
@@ -137,7 +137,7 @@ class Track implements Chunk {
 			// Convert NoteEvent to it's respective NoteOn/NoteOff events
 			// Note that as we splice in events the delta for the NoteOff ones will
 			// Need to change based on what comes before them after the splice.
-			noteEvent.buildData().events.forEach((e) => e.buildData(this));
+			noteEvent.events.forEach((e) => e.buildData(this));
 
 			// Merge each event individually into this track's event list.
 			noteEvent.events.forEach((event) => this.mergeSingleEvent(event));

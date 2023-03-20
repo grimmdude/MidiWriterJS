@@ -12,7 +12,6 @@ import {Utils} from '../utils';
 class NoteEvent implements AbstractEvent {
 	data: number[];
 	delta: number;
-	events: MidiEvent[];
 	pitch: string[];
 	grace: string|string[];
 	channel: number;
@@ -40,15 +39,15 @@ class NoteEvent implements AbstractEvent {
 
 		this.tickDuration = Utils.getTickDuration(this.duration);
 		this.restDuration = Utils.getTickDuration(this.wait);
-
-		this.events = []; // Hold actual NoteOn/NoteOff events
 	}
 
 	/**
-	 * Builds array of NoteOnEvent & NoteOffEvent
+	 * Gets array of NoteOnEvent & NoteOffEvents
 	 * @return {NoteEvent}
 	 */
-	buildData(): NoteEvent {
+	public get events(): MidiEvent[] {
+		const events = [];
+
 		/*
 		// this.data isn't currently being used in this class.
 
@@ -101,7 +100,7 @@ class NoteEvent implements AbstractEvent {
 						});
 					}
 
-					this.events.push(noteOnNew);
+					events.push(noteOnNew);
 				});
 
 				// Note off
@@ -130,7 +129,7 @@ class NoteEvent implements AbstractEvent {
 						});
 					}
 
-					this.events.push(noteOffNew);
+					events.push(noteOffNew);
 				});
 			}
 
@@ -154,12 +153,12 @@ class NoteEvent implements AbstractEvent {
 						pitch: p,
 					});
 
-					this.events.push(noteOnNew, noteOffNew);
+					events.push(noteOnNew, noteOffNew);
 				});
 			}
 		}
 
-		return this;
+		return events;
 	}
 
 	public get name() {
