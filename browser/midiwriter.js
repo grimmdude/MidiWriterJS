@@ -822,22 +822,27 @@ var MidiWriter = (function () {
             this.events = []; // Hold actual NoteOn/NoteOff events
         }
         /**
-         * Builds int array for this event.
+         * Builds array of NoteOnEvent & NoteOffEvent
          * @return {NoteEvent}
          */
         NoteEvent.prototype.buildData = function () {
-            var _this = this;
+            /*
+            // this.data isn't currently being used in this class.
+
             // Reset data array
             this.data = [];
+
             // Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
             if (this.grace) {
-                var graceDuration_1 = 1;
+                const graceDuration = 1;
                 this.grace = Utils.toArray(this.grace);
-                this.grace.forEach(function () {
-                    var noteEvent = new NoteEvent({ pitch: _this.grace, duration: 'T' + graceDuration_1 });
-                    _this.data = _this.data.concat(noteEvent.data);
+                this.grace.forEach(() => {
+                    const noteEvent = new NoteEvent({pitch: this.grace, duration:'T' + graceDuration});
+                    this.data = this.data.concat(noteEvent.data);
                 });
             }
+            */
+            var _this = this;
             // fields.pitch could be an array of pitches.
             // If so create note events for each and apply the same duration.
             // By default this is a chord if it's an array of notes that requires one NoteOnEvent.
@@ -859,7 +864,7 @@ var MidiWriter = (function () {
                             });
                         }
                         else {
-                            // Running status (can ommit the note on status)
+                            // Running status (can omit the note on status)
                             //noteOn = new NoteOnEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
                             noteOnNew = new NoteOnEvent({
                                 channel: _this.channel,

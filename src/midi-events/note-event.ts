@@ -41,14 +41,17 @@ class NoteEvent implements AbstractEvent {
 		this.tickDuration = Utils.getTickDuration(this.duration);
 		this.restDuration = Utils.getTickDuration(this.wait);
 
-		this.events 	= []; // Hold actual NoteOn/NoteOff events
+		this.events = []; // Hold actual NoteOn/NoteOff events
 	}
 
 	/**
-	 * Builds int array for this event.
+	 * Builds array of NoteOnEvent & NoteOffEvent
 	 * @return {NoteEvent}
 	 */
 	buildData(): NoteEvent {
+		/*
+		// this.data isn't currently being used in this class.
+
 		// Reset data array
 		this.data = [];
 
@@ -61,6 +64,7 @@ class NoteEvent implements AbstractEvent {
 				this.data = this.data.concat(noteEvent.data);
 			});
 		}
+		*/
 
 		// fields.pitch could be an array of pitches.
 		// If so create note events for each and apply the same duration.
@@ -85,7 +89,7 @@ class NoteEvent implements AbstractEvent {
 						});
 
 					} else {
-						// Running status (can ommit the note on status)
+						// Running status (can omit the note on status)
 						//noteOn = new NoteOnEvent({data: [0, Utils.getPitch(p), Utils.convertVelocity(this.velocity)]});
 						noteOnNew = new NoteOnEvent({
 							channel: this.channel,
