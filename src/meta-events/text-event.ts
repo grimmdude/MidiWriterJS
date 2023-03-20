@@ -8,27 +8,31 @@ import {Utils} from '../utils';
  * @return {TextEvent}
  */
 class TextEvent implements MetaEvent {
-	data: number[];
 	delta: number;
-	name: string;
 	text: string;
-	type: 0x01;
 
 	constructor(fields: { text: string; delta?: number; }) {
 		this.delta = fields.delta || 0x00;
 		this.text = fields.text;
-		this.name = 'TextEvent';
-		this.type = 0x01;
+	}
 
+	public get data() {
 		const textBytes = Utils.stringToBytes(this.text);
 
-		// Start with zero time delta
-		this.data = Utils.numberToVariableLength(fields.delta).concat(
+		return Utils.numberToVariableLength(this.delta).concat(
 			Constants.META_EVENT_ID,
 			this.type,
 			Utils.numberToVariableLength(textBytes.length), // Size
 			textBytes, // Text
 		);
+	}
+
+	public get name() {
+		return 'TextEvent';
+	}
+
+	public get type() {
+		return 0x01;
 	}
 }
 

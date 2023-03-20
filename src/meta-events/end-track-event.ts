@@ -8,21 +8,25 @@ import {Utils} from '../utils';
  * @return {EndTrackEvent}
  */
 class EndTrackEvent implements MetaEvent {
-	data: number[];
 	delta: number;
-	name: string;
-	type: [0x2F, 0x00];
 
 	constructor(fields?: { delta: number; }) {
 		this.delta = fields?.delta || 0x00;
-		this.name = 'EndTrackEvent';
-		this.type = [0x2F, 0x00];
+	}
 
-		// Start with zero time delta
-		this.data = Utils.numberToVariableLength(this.delta).concat(
+	public get data() {
+		return Utils.numberToVariableLength(this.delta).concat(
 			Constants.META_EVENT_ID,
 			this.type
 		);
+	}
+
+	public get name() {
+		return 'EndTrackEvent';
+	}
+
+	public get type() {
+		return [0x2F, 0x00];
 	}
 }
 

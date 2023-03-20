@@ -10,8 +10,6 @@ class NoteOnEvent implements MidiEvent {
 	channel: number;
 	data: number[];
 	delta: number;
-	status: 0x90;
-	name: string;
 	pitch: string|string[]|number|number[];
 	velocity: number;
 	wait: string|number;
@@ -19,16 +17,14 @@ class NoteOnEvent implements MidiEvent {
 	deltaWithPrecisionCorrection: number;
 
 	constructor(fields: { channel?: number; wait?: string|number; velocity?: number; pitch?: string|string[]|number|number[]; tick?: number; data?: number[]; delta?: number }) {
-		this.name 		= 'NoteOnEvent';
-		this.channel 	= fields.channel || 1;
-		this.pitch 		= fields.pitch;
-		this.wait 		= fields.wait || 0;
-		this.velocity 	= fields.velocity || 50;
+		this.channel = fields.channel || 1;
+		this.pitch = fields.pitch;
+		this.wait = fields.wait || 0;
+		this.velocity = fields.velocity || 50;
 
-		this.tick 		= fields.tick || null;
-		this.delta 		= null;
-		this.data 		= fields.data;
-		this.status = 0x90;
+		this.tick = fields.tick || null;
+		this.delta = null;
+		this.data = fields.data;
 	}
 
 	/**
@@ -57,12 +53,20 @@ class NoteOnEvent implements MidiEvent {
 
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
-						this.status | this.channel - 1,
-							Utils.getPitch(this.pitch, options.middleC),
-							Utils.convertVelocity(this.velocity)
+						this.status,
+						Utils.getPitch(this.pitch, options.middleC),
+						Utils.convertVelocity(this.velocity)
 					);
 
 		return this;
+	}
+
+	public get name() {
+		return 'NoteOnEvent';
+	}
+
+	public get status() {
+		return 0x90 | this.channel - 1;
 	}
 }
 

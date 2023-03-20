@@ -11,22 +11,18 @@ class NoteOffEvent implements MidiEvent {
 	data: number[];
 	delta: number;
 	deltaWithPrecisionCorrection: number;
-	status: 0x80;
-	name: string;
 	velocity: number;
 	pitch: string|number;
 	duration: string|number;
 	tick: number;
 
 	constructor(fields: { channel: number; duration: string|number; velocity: number; pitch: string|number; tick?: number; data?: number[]; delta?: number }) {
-		this.name = 'NoteOffEvent';
 		this.channel = fields.channel || 1;
 		this.pitch = fields.pitch;
 		this.velocity = fields.velocity || 50;
 		this.tick = fields.tick || null;
 		this.data = fields.data;
 		this.delta = fields.delta || Utils.getTickDuration(fields.duration);
-		this.status = 0x80;
 	}
 
 	/**
@@ -43,12 +39,20 @@ class NoteOffEvent implements MidiEvent {
 
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
 					.concat(
-							this.status | this.channel - 1,
+							this.status,
 							Utils.getPitch(this.pitch, options.middleC),
 							Utils.convertVelocity(this.velocity)
 					);
 
 		return this;
+	}
+
+	public get name() {
+		return 'NoteOffEvent';
+	}
+
+	public get status() {
+		return 0x80 | this.channel - 1;
 	}
 }
 

@@ -13,7 +13,6 @@ class NoteEvent implements AbstractEvent {
 	data: number[];
 	delta: number;
 	events: MidiEvent[];
-	name: string;
 	pitch: string[];
 	grace: string|string[];
 	channel: number;
@@ -28,7 +27,6 @@ class NoteEvent implements AbstractEvent {
 
 	constructor(fields) {
 		this.data = [];
-		this.name = 'NoteEvent';
 		this.pitch = Utils.toArray(fields.pitch);
 
 		this.channel = fields.channel || 1;
@@ -158,6 +156,10 @@ class NoteEvent implements AbstractEvent {
 		}
 
 		return this;
+	}
+
+	public get name() {
+		return 'NoteEvent';
 	}
 }
 

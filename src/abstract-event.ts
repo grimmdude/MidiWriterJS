@@ -1,7 +1,7 @@
 interface AbstractEvent {
-    data: number[];
+    readonly data: number[];
     delta: number;
-    name: string;
+    readonly name: string;
     tick?: number;
 }
 

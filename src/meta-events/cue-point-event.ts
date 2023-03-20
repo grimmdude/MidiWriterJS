@@ -8,27 +8,31 @@ import {Utils} from '../utils';
  * @return {CuePointEvent}
  */
 class CuePointEvent implements MetaEvent {
-	data: number[];
 	delta: number;
-	name: string;
 	text: string;
-	type: 0x07;
 
 	constructor(fields: { text: string; delta?: number; }) {
 		this.delta = fields.delta || 0x00;
-		this.name = 'CuePointEvent';
 		this.text = fields.text;
-		this.type = 0x07;
+	}
 
+	public get data() {
 		const textBytes = Utils.stringToBytes(this.text);
 
-		// Start with zero time delta
-		this.data = Utils.numberToVariableLength(this.delta).concat(
+		return Utils.numberToVariableLength(this.delta).concat(
 			Constants.META_EVENT_ID,
 			this.type,
 			Utils.numberToVariableLength(textBytes.length), // Size
 			textBytes, // Text
 		);
+	}
+
+	public get name() {
+		return 'CuePointEvent';
+	}
+
+	public get type() {
+		return 0x07;
 	}
 }
 

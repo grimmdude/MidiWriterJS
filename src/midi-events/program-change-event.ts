@@ -8,20 +8,25 @@ import {Utils} from '../utils';
  */
 class ProgramChangeEvent implements MidiEvent {
 	channel: number;
-    data: number[];
     delta: number;
-	status: 0xC0;
-    name: string;
 	instrument: number;
 
 	constructor(fields: { channel?: number; delta?: number; instrument: number; }) {
 		this.channel = fields.channel || 0;
 		this.delta = fields.delta || 0x00;
 		this.instrument = fields.instrument;
-		this.status = 0xC0;
-		this.name = 'ProgramChangeEvent';
-		// delta time defaults to 0.
-		this.data = Utils.numberToVariableLength(this.delta).concat(this.status | this.channel, this.instrument);
+	}
+
+	public get data() {
+		return Utils.numberToVariableLength(this.delta).concat(this.status, this.instrument);
+	}
+
+	public get name() {
+		return 'ProgramChangeEvent';
+	}
+
+	public get status() {
+		return 0xC0 | this.channel;
 	}
 }
 

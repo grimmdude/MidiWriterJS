@@ -9,28 +9,32 @@ import {Utils} from '../utils';
  */
 class TempoEvent implements MetaEvent {
 	bpm: number;
-	data: number[];
 	delta: number;
-	name: string;
 	tick: number;
-	type: 0x51;
 	
 	constructor(fields: { bpm: number; tick?: number; delta?: number; }) {
 		this.bpm = fields.bpm;
 		this.delta = fields.delta || 0x00;
 		this.tick = fields.tick;
-		this.name = 'TempoEvent';
-		this.type = 0x51;
+	}
 
+	public get data() {
 		const tempo = Math.round(60000000 / this.bpm);
 
-		// Start with zero time delta
-		this.data = Utils.numberToVariableLength(this.delta).concat(
+		return Utils.numberToVariableLength(this.delta).concat(
 			Constants.META_EVENT_ID,
 			this.type,
 			[0x03], // Size
 			Utils.numberToBytes(tempo, 3), // Tempo, 3 bytes
 		);
+	}
+
+	public get name() {
+		return 'TempoEvent';
+	}
+
+	public get type() {
+		return 0x51;
 	}
 }
 

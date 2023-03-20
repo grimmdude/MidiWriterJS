@@ -391,10 +391,28 @@ var MidiWriter = (function () {
             this.controllerValue = fields.controllerValue;
             this.controllerNumber = fields.controllerNumber;
             this.delta = fields.delta || 0x00;
-            this.name = 'ControllerChangeEvent';
-            this.status = 0xB0;
-            this.data = Utils.numberToVariableLength(fields.delta).concat(this.status | this.channel, this.controllerNumber, this.controllerValue);
         }
+        Object.defineProperty(ControllerChangeEvent.prototype, "data", {
+            get: function () {
+                return Utils.numberToVariableLength(this.delta).concat(this.status, this.controllerNumber, this.controllerValue);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(ControllerChangeEvent.prototype, "name", {
+            get: function () {
+                return 'ControllerChangeEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(ControllerChangeEvent.prototype, "status", {
+            get: function () {
+                return 0xB0 | this.channel;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return ControllerChangeEvent;
     }());
 
@@ -406,14 +424,31 @@ var MidiWriter = (function () {
     var CopyrightEvent = /** @class */ (function () {
         function CopyrightEvent(fields) {
             this.delta = fields.delta || 0x00;
-            this.name = 'CopyrightEvent';
             this.text = fields.text;
-            this.type = 0x02;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(CopyrightEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CopyrightEvent.prototype, "name", {
+            get: function () {
+                return 'CopyrightEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CopyrightEvent.prototype, "type", {
+            get: function () {
+                return 0x02;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return CopyrightEvent;
     }());
 
@@ -425,14 +460,31 @@ var MidiWriter = (function () {
     var CuePointEvent = /** @class */ (function () {
         function CuePointEvent(fields) {
             this.delta = fields.delta || 0x00;
-            this.name = 'CuePointEvent';
             this.text = fields.text;
-            this.type = 0x07;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(CuePointEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CuePointEvent.prototype, "name", {
+            get: function () {
+                return 'CuePointEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CuePointEvent.prototype, "type", {
+            get: function () {
+                return 0x07;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return CuePointEvent;
     }());
 
@@ -444,11 +496,28 @@ var MidiWriter = (function () {
     var EndTrackEvent = /** @class */ (function () {
         function EndTrackEvent(fields) {
             this.delta = (fields === null || fields === void 0 ? void 0 : fields.delta) || 0x00;
-            this.name = 'EndTrackEvent';
-            this.type = [0x2F, 0x00];
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type);
         }
+        Object.defineProperty(EndTrackEvent.prototype, "data", {
+            get: function () {
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EndTrackEvent.prototype, "name", {
+            get: function () {
+                return 'EndTrackEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EndTrackEvent.prototype, "type", {
+            get: function () {
+                return [0x2F, 0x00];
+            },
+            enumerable: false,
+            configurable: true
+        });
         return EndTrackEvent;
     }());
 
@@ -460,14 +529,32 @@ var MidiWriter = (function () {
     var InstrumentNameEvent = /** @class */ (function () {
         function InstrumentNameEvent(fields) {
             this.delta = fields.delta || 0x00;
-            this.name = 'InstrumentNameEvent';
             this.text = fields.text;
-            this.type = 0x04;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(InstrumentNameEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                // Start with zero time delta
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(InstrumentNameEvent.prototype, "name", {
+            get: function () {
+                return 'InstrumentNameEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(InstrumentNameEvent.prototype, "type", {
+            get: function () {
+                return 0x04;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return InstrumentNameEvent;
     }());
 
@@ -477,8 +564,6 @@ var MidiWriter = (function () {
      */
     var KeySignatureEvent = /** @class */ (function () {
         function KeySignatureEvent(sf, mi) {
-            this.name = 'KeySignatureEvent';
-            this.type = 0x59;
             var mode = mi || 0;
             sf = sf || 0;
             //	Function called with string notation
@@ -523,6 +608,20 @@ var MidiWriter = (function () {
             Utils.numberToBytes(sf, 1), // Number of sharp or flats ( < 0 flat; > 0 sharp)
             Utils.numberToBytes(mode, 1));
         }
+        Object.defineProperty(KeySignatureEvent.prototype, "name", {
+            get: function () {
+                return 'KeySignatureEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(KeySignatureEvent.prototype, "type", {
+            get: function () {
+                return 0x59;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return KeySignatureEvent;
     }());
 
@@ -534,14 +633,31 @@ var MidiWriter = (function () {
     var LyricEvent = /** @class */ (function () {
         function LyricEvent(fields) {
             this.delta = fields.delta || 0x00;
-            this.name = 'LyricEvent';
             this.text = fields.text;
-            this.type = 0x05;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(LyricEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(LyricEvent.prototype, "name", {
+            get: function () {
+                return 'LyricEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(LyricEvent.prototype, "type", {
+            get: function () {
+                return 0x05;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return LyricEvent;
     }());
 
@@ -553,14 +669,31 @@ var MidiWriter = (function () {
     var MarkerEvent = /** @class */ (function () {
         function MarkerEvent(fields) {
             this.delta = fields.delta || 0x00;
-            this.name = 'MarkerEvent';
             this.text = fields.text;
-            this.type = 0x06;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(MarkerEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(MarkerEvent.prototype, "name", {
+            get: function () {
+                return 'MarkerEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(MarkerEvent.prototype, "type", {
+            get: function () {
+                return 0x06;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return MarkerEvent;
     }());
 
@@ -571,7 +704,6 @@ var MidiWriter = (function () {
      */
     var NoteOnEvent = /** @class */ (function () {
         function NoteOnEvent(fields) {
-            this.name = 'NoteOnEvent';
             this.channel = fields.channel || 1;
             this.pitch = fields.pitch;
             this.wait = fields.wait || 0;
@@ -579,7 +711,6 @@ var MidiWriter = (function () {
             this.tick = fields.tick || null;
             this.delta = null;
             this.data = fields.data;
-            this.status = 0x90;
         }
         /**
          * Builds int array for this event.
@@ -603,9 +734,23 @@ var MidiWriter = (function () {
             }
             this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
             this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
-                .concat(this.status | this.channel - 1, Utils.getPitch(this.pitch, options.middleC), Utils.convertVelocity(this.velocity));
+                .concat(this.status, Utils.getPitch(this.pitch, options.middleC), Utils.convertVelocity(this.velocity));
             return this;
         };
+        Object.defineProperty(NoteOnEvent.prototype, "name", {
+            get: function () {
+                return 'NoteOnEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(NoteOnEvent.prototype, "status", {
+            get: function () {
+                return 0x90 | this.channel - 1;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return NoteOnEvent;
     }());
 
@@ -616,14 +761,12 @@ var MidiWriter = (function () {
      */
     var NoteOffEvent = /** @class */ (function () {
         function NoteOffEvent(fields) {
-            this.name = 'NoteOffEvent';
             this.channel = fields.channel || 1;
             this.pitch = fields.pitch;
             this.velocity = fields.velocity || 50;
             this.tick = fields.tick || null;
             this.data = fields.data;
             this.delta = fields.delta || Utils.getTickDuration(fields.duration);
-            this.status = 0x80;
         }
         /**
          * Builds int array for this event.
@@ -637,9 +780,23 @@ var MidiWriter = (function () {
             }
             this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
             this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
-                .concat(this.status | this.channel - 1, Utils.getPitch(this.pitch, options.middleC), Utils.convertVelocity(this.velocity));
+                .concat(this.status, Utils.getPitch(this.pitch, options.middleC), Utils.convertVelocity(this.velocity));
             return this;
         };
+        Object.defineProperty(NoteOffEvent.prototype, "name", {
+            get: function () {
+                return 'NoteOffEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(NoteOffEvent.prototype, "status", {
+            get: function () {
+                return 0x80 | this.channel - 1;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return NoteOffEvent;
     }());
 
@@ -651,7 +808,6 @@ var MidiWriter = (function () {
     var NoteEvent = /** @class */ (function () {
         function NoteEvent(fields) {
             this.data = [];
-            this.name = 'NoteEvent';
             this.pitch = Utils.toArray(fields.pitch);
             this.channel = fields.channel || 1;
             this.duration = fields.duration || '4';
@@ -768,6 +924,13 @@ var MidiWriter = (function () {
             }
             return this;
         };
+        Object.defineProperty(NoteEvent.prototype, "name", {
+            get: function () {
+                return 'NoteEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
         return NoteEvent;
     }());
 
@@ -781,12 +944,8 @@ var MidiWriter = (function () {
         function PitchBendEvent(fields) {
             this.channel = fields.channel || 0;
             this.delta = fields.delta || 0x00;
-            this.name = 'PitchBendEvent';
             this.status = 0xE0;
-            var bend14 = this.scale14bits(fields.bend);
-            var lsbValue = bend14 & 0x7f;
-            var msbValue = (bend14 >> 7) & 0x7f;
-            this.data = Utils.numberToVariableLength(this.delta).concat(this.status | this.channel, lsbValue, msbValue);
+            this.bend = fields.bend;
         }
         PitchBendEvent.prototype.scale14bits = function (zeroOne) {
             if (zeroOne <= 0) {
@@ -794,6 +953,23 @@ var MidiWriter = (function () {
             }
             return Math.floor(16383 * (zeroOne + 1) / 2);
         };
+        Object.defineProperty(PitchBendEvent.prototype, "data", {
+            get: function () {
+                var bend14 = this.scale14bits(this.bend);
+                var lsbValue = bend14 & 0x7f;
+                var msbValue = (bend14 >> 7) & 0x7f;
+                return Utils.numberToVariableLength(this.delta).concat(this.status | this.channel, lsbValue, msbValue);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(PitchBendEvent.prototype, "name", {
+            get: function () {
+                return 'PitchBendEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
         return PitchBendEvent;
     }());
 
@@ -807,11 +983,28 @@ var MidiWriter = (function () {
             this.channel = fields.channel || 0;
             this.delta = fields.delta || 0x00;
             this.instrument = fields.instrument;
-            this.status = 0xC0;
-            this.name = 'ProgramChangeEvent';
-            // delta time defaults to 0.
-            this.data = Utils.numberToVariableLength(this.delta).concat(this.status | this.channel, this.instrument);
         }
+        Object.defineProperty(ProgramChangeEvent.prototype, "data", {
+            get: function () {
+                return Utils.numberToVariableLength(this.delta).concat(this.status, this.instrument);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(ProgramChangeEvent.prototype, "name", {
+            get: function () {
+                return 'ProgramChangeEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(ProgramChangeEvent.prototype, "status", {
+            get: function () {
+                return 0xC0 | this.channel;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return ProgramChangeEvent;
     }());
 
@@ -825,13 +1018,30 @@ var MidiWriter = (function () {
             this.bpm = fields.bpm;
             this.delta = fields.delta || 0x00;
             this.tick = fields.tick;
-            this.name = 'TempoEvent';
-            this.type = 0x51;
-            var tempo = Math.round(60000000 / this.bpm);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, [0x03], // Size
-            Utils.numberToBytes(tempo, 3));
         }
+        Object.defineProperty(TempoEvent.prototype, "data", {
+            get: function () {
+                var tempo = Math.round(60000000 / this.bpm);
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, [0x03], // Size
+                Utils.numberToBytes(tempo, 3));
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TempoEvent.prototype, "name", {
+            get: function () {
+                return 'TempoEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TempoEvent.prototype, "type", {
+            get: function () {
+                return 0x51;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return TempoEvent;
     }());
 
@@ -844,13 +1054,30 @@ var MidiWriter = (function () {
         function TextEvent(fields) {
             this.delta = fields.delta || 0x00;
             this.text = fields.text;
-            this.name = 'TextEvent';
-            this.type = 0x01;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(fields.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(TextEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TextEvent.prototype, "name", {
+            get: function () {
+                return 'TextEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TextEvent.prototype, "type", {
+            get: function () {
+                return 0x01;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return TextEvent;
     }());
 
@@ -860,8 +1087,6 @@ var MidiWriter = (function () {
      */
     var TimeSignatureEvent = /** @class */ (function () {
         function TimeSignatureEvent(numerator, denominator, midiclockspertick, notespermidiclock) {
-            this.name = 'TimeSignatureEvent';
-            this.type = 0x58;
             // Start with zero time delta
             this.data = Utils.numberToVariableLength(0x00).concat(Constants.META_EVENT_ID, this.type, [0x04], // Size
             Utils.numberToBytes(numerator, 1), // Numerator, 1 bytes
@@ -869,6 +1094,20 @@ var MidiWriter = (function () {
             Utils.numberToBytes(midiclockspertick || 24, 1), // MIDI Clocks per tick, 1 bytes
             Utils.numberToBytes(notespermidiclock || 8, 1));
         }
+        Object.defineProperty(TimeSignatureEvent.prototype, "name", {
+            get: function () {
+                return 'TimeSignatureEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TimeSignatureEvent.prototype, "type", {
+            get: function () {
+                return 0x58;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return TimeSignatureEvent;
     }());
 
@@ -880,14 +1119,32 @@ var MidiWriter = (function () {
     var TrackNameEvent = /** @class */ (function () {
         function TrackNameEvent(fields) {
             this.delta = fields.delta || 0x00;
-            this.name = 'TrackNameEvent';
             this.text = fields.text;
-            this.type = 0x03;
-            var textBytes = Utils.stringToBytes(this.text);
-            // Start with zero time delta
-            this.data = Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
-            textBytes);
         }
+        Object.defineProperty(TrackNameEvent.prototype, "data", {
+            get: function () {
+                var textBytes = Utils.stringToBytes(this.text);
+                // Start with zero time delta
+                return Utils.numberToVariableLength(this.delta).concat(Constants.META_EVENT_ID, this.type, Utils.numberToVariableLength(textBytes.length), // Size
+                textBytes);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TrackNameEvent.prototype, "name", {
+            get: function () {
+                return 'TrackNameEvent';
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(TrackNameEvent.prototype, "type", {
+            get: function () {
+                return 0x03;
+            },
+            enumerable: false,
+            configurable: true
+        });
         return TrackNameEvent;
     }());
 
