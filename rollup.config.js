@@ -1,10 +1,10 @@
-import babel from '@rollup/plugin-babel';
+import typescript from '@rollup/plugin-typescript';
 import replace from "@rollup/plugin-replace";
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
 
 export default [
   {
-    input: "src/main.js",
+    input: "src/main.ts",
     output: [
       {
         file: "browser/midiwriter.js",
@@ -18,33 +18,25 @@ export default [
       },
     ],
     plugins: [
+      typescript(),
       replace({
         "process.browser": true,
         "preventAssignment": true 
       }),
       nodeResolve(),
-      babel({
-        exclude: "node_modules/**", // only transpile our source code
-        plugins: ["@babel/plugin-transform-destructuring"],
-        babelHelpers: 'bundled'
-      }),
-      
     ],
   },
   {
-    input: 'src/main.js',
+    input: 'src/main.ts',
     output: {
       file: 'build/index.js',
       format: 'cjs',
-      exports: 'default',
+      exports: 'named',
     },
     external: ['tonal-midi', 'fs'],
     plugins: [
-      babel({
-        exclude: 'node_modules/**', // only transpile our source code
-        plugins: ['@babel/plugin-transform-destructuring'],
-        babelHelpers: 'bundled'
-      })
+      typescript(),
+      nodeResolve()
     ]
   }
 ];

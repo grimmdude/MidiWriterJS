@@ -1,7 +1,8 @@
 &#9836; MidiWriterJS
 ===============
 [![npm version](https://badge.fury.io/js/midi-writer-js.svg)](https://badge.fury.io/js/midi-writer-js)
-[![Build Status](https://travis-ci.org/grimmdude/MidiWriterJS.svg?branch=master)](https://travis-ci.org/grimmdude/MidiWriterJS)
+![Tests](https://github.com/grimmdude/MidiWriterJS/actions/workflows/lint.js.yml/badge.svg)
+![Lint](https://github.com/grimmdude/MidiWriterJS/actions/workflows/node.js.yml/badge.svg)
 [![Try midi-writer-js on RunKit](https://badge.runkitcdn.com/midi-writer-js.svg)](https://npm.runkit.com/midi-writer-js)
 
 MidiWriterJS is a JavaScript library providing an API for generating expressive multi-track MIDI files.  
@@ -17,6 +18,7 @@ npm install midi-writer-js
 ```
 Getting Started
 ------------
+
 ```javascript
 import MidiWriter from 'midi-writer-js';
 
@@ -36,6 +38,7 @@ console.log(write.dataUri());
 ```
 Documentation
 ------------
+
 ### `MidiWriter.Track()`
 
 - `addEvent({event}, mapFunction)`
@@ -50,6 +53,10 @@ Documentation
 - `setTimeSignature(numerator, denominator)`
 
 ### `MidiWriter.NoteEvent({options})`
+
+The MIDI spec defines that each note must have a `NoteOnEvent` and `NoteOffEvent` (or `NoteOnEvent` with zero velocity) event, marking the beginning and end of the sounding note.  While it's possible to manually add these events to a track with `Track.addEvent()`, the `NoteEvent` provides a more intuitive interface for doing this with a single, "pseudo" event.  Under the hood, the `NoteEvent` event generates the relevant `NoteOnEvent` and `NoteOffEvent` events.
+
+Each MIDI event has a `delta` property, which is used to define the number of ticks to wait after the previous event.  This can be challenging to calculate if you're not necessarily adding events in a serial fashion.  Because of this, you can alternatively use the `tick` property to define the exact tick where the event should fall.
 
 The `NoteEvent` supports these options:
 
@@ -134,7 +141,7 @@ The `NoteEvent` supports these options:
 			<td>Grace note to be applied to note event.  Takes same value format as <code>pitch</code></td>
 		</tr>
 		<tr>
-			<td><b>startTick</b></td>
+			<td><b>tick</b></td>
 			<td>number</td>
 			<td></td>
 			<td>Specific tick where this event should be played.  If this parameter is supplied then <code>wait</code> is disregarded if also supplied.</td>
@@ -187,3 +194,7 @@ const track = vexWriter.trackFromVoice(voice);
 const writer = new MidiWriter.Writer([track]);
 console.log(writer.dataUri());
 ```
+
+
+## Demos
+* [Example with Magenta player](https://codepen.io/dirkk0/pen/rNZLXjZ) by Dirk Krause [@dirkk0](https://github.com/dirkk0)

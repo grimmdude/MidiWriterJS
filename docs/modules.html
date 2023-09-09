@@ -12,140 +12,37 @@
 <div class="col-content">
 <div class="tsd-page-title">
 <h2>midi-writer-js</h2></div>
-<div class="tsd-panel tsd-typography"><a id="md:9836-midiwriterjs" class="tsd-anchor"></a><h1><a href="#md:9836-midiwriterjs">&#9836; MidiWriterJS</a></h1><p><a href="https://badge.fury.io/js/midi-writer-js"><img src="https://badge.fury.io/js/midi-writer-js.svg" alt="npm version"></a>
-<img src="https://github.com/grimmdude/MidiWriterJS/actions/workflows/lint.js.yml/badge.svg" alt="Tests">
-<img src="https://github.com/grimmdude/MidiWriterJS/actions/workflows/node.js.yml/badge.svg" alt="Lint">
-<a href="https://npm.runkit.com/midi-writer-js"><img src="https://badge.runkitcdn.com/midi-writer-js.svg" alt="Try midi-writer-js on RunKit"></a></p>
-<p>MidiWriterJS is a JavaScript library providing an API for generating expressive multi-track MIDI files.  </p>
-<p>Note that the <code>master</code> branch is in active development so if you&#39;re looking for a tried and true stable version please use the latest release.</p>
-<p><a href="https://grimmdude.com/MidiWriterJS/docs/">Source Documentation</a></p>
-<a id="md:install" class="tsd-anchor"></a><h2><a href="#md:install">Install</a></h2><pre><code class="language-sh"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">midi-writer-js</span>
-</code><button>Copy</button></pre>
-<a id="md:getting-started" class="tsd-anchor"></a><h2><a href="#md:getting-started">Getting Started</a></h2><pre><code class="language-javascript"><span class="hl-3">import</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1"> </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;midi-writer-js&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">// Start with a new track</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">track</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">Track</span><span class="hl-1">();</span><br/><br/><span class="hl-5">// Define an instrument (optional):</span><br/><span class="hl-4">track</span><span class="hl-1">.</span><span class="hl-0">addEvent</span><span class="hl-1">(</span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">ProgramChangeEvent</span><span class="hl-1">({</span><span class="hl-4">instrument:</span><span class="hl-1"> </span><span class="hl-8">1</span><span class="hl-1">}));</span><br/><br/><span class="hl-5">// Add some notes:</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">note</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;E4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;4&#39;</span><span class="hl-1">});</span><br/><span class="hl-4">track</span><span class="hl-1">.</span><span class="hl-0">addEvent</span><span class="hl-1">(</span><span class="hl-4">note</span><span class="hl-1">);</span><br/><br/><span class="hl-5">// Generate a data URI</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">write</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">Writer</span><span class="hl-1">(</span><span class="hl-4">track</span><span class="hl-1">);</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">write</span><span class="hl-1">.</span><span class="hl-0">dataUri</span><span class="hl-1">());</span>
-</code><button>Copy</button></pre>
-<a id="md:documentation" class="tsd-anchor"></a><h2><a href="#md:documentation">Documentation</a></h2><a id="md:midiwritertrack" class="tsd-anchor"></a><h3><a href="#md:midiwritertrack"><code>MidiWriter.Track()</code></a></h3><ul>
-<li><code>addEvent({event}, mapFunction)</code></li>
-<li><code>setTempo(tempo)</code></li>
-<li><code>addText(text)</code></li>
-<li><code>addCopyright(text)</code></li>
-<li><code>addTrackName(text)</code></li>
-<li><code>addInstrumentName(text)</code></li>
-<li><code>addMarker(text)</code></li>
-<li><code>addCuePoint(text)</code></li>
-<li><code>addLyric(text)</code></li>
-<li><code>setTimeSignature(numerator, denominator)</code></li>
-</ul>
-<a id="md:midiwriternoteeventoptions" class="tsd-anchor"></a><h3><a href="#md:midiwriternoteeventoptions"><code>MidiWriter.NoteEvent({options})</code></a></h3><p>The MIDI spec defines that each note must have a <code>NoteOnEvent</code> and <code>NoteOffEvent</code> (or <code>NoteOnEvent</code> with zero velocity) event, marking the beginning and end of the sounding note.  While it&#39;s possible to manually add these events to a track with <code>Track.addEvent()</code>, the <code>NoteEvent</code> provides a more intuitive interface for doing this with a single, &quot;pseudo&quot; event.  Under the hood, the <code>NoteEvent</code> event generates the relevant <code>NoteOnEvent</code> and <code>NoteOffEvent</code> events.</p>
-<p>Each MIDI event has a <code>delta</code> property, which is used to define the number of ticks to wait after the previous event.  This can be challenging to calculate if you&#39;re not necessarily adding events in a serial fashion.  Because of this, you can alternatively use the <code>tick</code> property to define the exact tick where the event should fall.</p>
-<p>The <code>NoteEvent</code> supports these options:</p>
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><b>pitch</b></td>
-            <td>string or array</td>
-            <td></td>
-            <td>Each pitch can be a string or valid MIDI note code.  Format for string is <code>C#4</code>.  Pro tip: You can use the output from <a href="https://github.com/danigb/tonal" target="_blank">tonal</a> functions to build scales, chords, intervals, etc. in this parameter.</td>
-        </tr>
-        <tr>
-            <td><b>duration</b></td>
-            <td>string or array</td>
-            <td></td>
-            <td>
-                How long the note should sound.
-                <ul>
-                    <li><code>1</code>  : whole</li>
-                    <li><code>2</code>  : half</li>
-                    <li><code>d2</code> : dotted half</li>
-                    <li><code>dd2</code> : double dotted half</li>
-                    <li><code>4</code>  : quarter</li>
-                    <li><code>4t</code>  : quarter triplet</li>
-                    <li><code>d4</code> : dotted quarter</li>
-                    <li><code>dd4</code> : double dotted quarter</li>
-                    <li><code>8</code>  : eighth</li>
-                    <li><code>8t</code> : eighth triplet</li>
-                    <li><code>d8</code> : dotted eighth</li>
-                    <li><code>dd8</code> : double dotted eighth</li>
-                    <li><code>16</code> : sixteenth</li>
-                    <li><code>16t</code> : sixteenth triplet</li>
-                    <li><code>32</code> : thirty-second</li>
-                    <li><code>64</code> : sixty-fourth</li>
-                    <li><code>Tn</code> : where n is an explicit number of ticks (T128 = 1 beat)</li>
-                </ul>
-                If an array of durations is passed then the sum of the durations will be used.
-            </td>
-        </tr>
-        <tr>
-            <td><b>wait</b></td>
-            <td>string or array</td>
-            <td><code>0</code></td>
-            <td>How long to wait before sounding note (rest).  Takes same values as <b>duration</b>.</td>
-        </tr>
-        <tr>
-            <td><b>sequential</b></td>
-            <td>boolean</td>
-            <td><code>false</code></td>
-            <td>If true then array of pitches will be played sequentially as opposed to simulatanously.</td>
-        </tr>
-        <tr>
-            <td><b>velocity</b></td>
-            <td>number</td>
-            <td><code>50</code></td>
-            <td>How loud the note should sound, values 1-100.</td>
-        </tr>
-        <tr>
-            <td><b>repeat</b></td>
-            <td>number</td>
-            <td><code>1</code></td>
-            <td>How many times this event should be repeated.</td>
-        </tr>
-        <tr>
-            <td><b>channel</b></td>
-            <td>number</td>
-            <td><code>1</code></td>
-            <td>MIDI channel to use.</td>
-        </tr>
-        <tr>
-            <td><b>grace</b></td>
-            <td>string or array</td>
-            <td></td>
-            <td>Grace note to be applied to note event.  Takes same value format as <code>pitch</code></td>
-        </tr>
-        <tr>
-            <td><b>tick</b></td>
-            <td>number</td>
-            <td></td>
-            <td>Specific tick where this event should be played.  If this parameter is supplied then <code>wait</code> is disregarded if also supplied.</td>
-        </tr>
-    </tbody>
-</table>
-
-
-<a id="md:midiwriterwritertracks" class="tsd-anchor"></a><h3><a href="#md:midiwriterwritertracks"><code>MidiWriter.Writer(tracks)</code></a></h3><p>The <code>Writer</code> class provides a few ways to output the file:</p>
-<ul>
-<li><code>buildFile()</code> <em>Uint8Array</em></li>
-<li><code>base64()</code> <em>string</em></li>
-<li><code>dataUri()</code> <em>string</em></li>
-<li><code>stdout()</code> <em>file stream (cli)</em></li>
-</ul>
-<a id="md:hot-cross-buns" class="tsd-anchor"></a><h3><a href="#md:hot-cross-buns">Hot Cross Buns</a></h3><p>Here&#39;s an example of how everyone&#39;s favorite song &quot;Hot Cross Buns&quot; could be written.  Note use of the mapping function passed as the second argument of <code>addEvent()</code>.  This can be used to apply specific properties to all events.  With some 
-street smarts you could also use it for programmatic crescendos and other property &#39;animation&#39;.</p>
-<pre><code class="language-javascript"><span class="hl-3">import</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1"> </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;midi-writer-js&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">track</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">Track</span><span class="hl-1">();</span><br/><br/><span class="hl-4">track</span><span class="hl-1">.</span><span class="hl-0">addEvent</span><span class="hl-1">([</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;E4&#39;</span><span class="hl-1">,</span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;4&#39;</span><span class="hl-1">}),</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;2&#39;</span><span class="hl-1">}),</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;E4&#39;</span><span class="hl-1">,</span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;4&#39;</span><span class="hl-1">}),</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;2&#39;</span><span class="hl-1">}),</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;8&#39;</span><span class="hl-1">}),</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;E4&#39;</span><span class="hl-1">,</span><span class="hl-2">&#39;D4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;4&#39;</span><span class="hl-1">}),</span><br/><span class="hl-1">        </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">NoteEvent</span><span class="hl-1">({</span><span class="hl-4">pitch:</span><span class="hl-1"> [</span><span class="hl-2">&#39;C4&#39;</span><span class="hl-1">], </span><span class="hl-4">duration:</span><span class="hl-1"> </span><span class="hl-2">&#39;2&#39;</span><span class="hl-1">})</span><br/><span class="hl-1">    ], </span><span class="hl-6">function</span><span class="hl-1">(</span><span class="hl-4">event</span><span class="hl-1">, </span><span class="hl-4">index</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-3">return</span><span class="hl-1"> {</span><span class="hl-4">sequential:</span><span class="hl-1"> </span><span class="hl-6">true</span><span class="hl-1">};</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">write</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">Writer</span><span class="hl-1">(</span><span class="hl-4">track</span><span class="hl-1">);</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">write</span><span class="hl-1">.</span><span class="hl-0">dataUri</span><span class="hl-1">());</span>
-</code><button>Copy</button></pre>
-<a id="md:vexflow-integration" class="tsd-anchor"></a><h3><a href="#md:vexflow-integration">VexFlow Integration</a></h3><p>MidiWriterJS can export MIDI from VexFlow voices, though this feature is still experimental.  Current usage is to use <code>MidiWriter.VexFlow.trackFromVoice(voice)</code> to create a MidiWriterJS <code>Track</code> object:</p>
-<pre><code class="language-javascript"><br/><span class="hl-5">// ...VexFlow code defining notes</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">voice</span><span class="hl-1"> = </span><span class="hl-0">create_4_4_voice</span><span class="hl-1">().</span><span class="hl-0">addTickables</span><span class="hl-1">(</span><span class="hl-4">notes</span><span class="hl-1">);</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">vexWriter</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">VexFlow</span><span class="hl-1">();</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">track</span><span class="hl-1"> = </span><span class="hl-4">vexWriter</span><span class="hl-1">.</span><span class="hl-0">trackFromVoice</span><span class="hl-1">(</span><span class="hl-4">voice</span><span class="hl-1">);</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">writer</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-4">MidiWriter</span><span class="hl-1">.</span><span class="hl-0">Writer</span><span class="hl-1">([</span><span class="hl-4">track</span><span class="hl-1">]);</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">writer</span><span class="hl-1">.</span><span class="hl-0">dataUri</span><span class="hl-1">());</span>
-</code><button>Copy</button></pre>
-<a id="md:demos" class="tsd-anchor"></a><h2><a href="#md:demos">Demos</a></h2><ul>
-<li><a href="https://codepen.io/dirkk0/pen/rNZLXjZ">Example with Magenta player</a> by Dirk Krause <a href="https://github.com/dirkk0">@dirkk0</a></li>
-</ul>
-</div></div>
+<section class="tsd-panel-group tsd-index-group">
+<section class="tsd-panel tsd-index-panel">
+<h3 class="tsd-index-heading uppercase">Index</h3>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Classes</h3>
+<div class="tsd-index-list"><a href="classes/ControllerChangeEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Controller<wbr/>Change<wbr/>Event</span></a>
+<a href="classes/CopyrightEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Copyright<wbr/>Event</span></a>
+<a href="classes/CuePointEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Cue<wbr/>Point<wbr/>Event</span></a>
+<a href="classes/EndTrackEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>End<wbr/>Track<wbr/>Event</span></a>
+<a href="classes/InstrumentNameEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Instrument<wbr/>Name<wbr/>Event</span></a>
+<a href="classes/KeySignatureEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Key<wbr/>Signature<wbr/>Event</span></a>
+<a href="classes/LyricEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Lyric<wbr/>Event</span></a>
+<a href="classes/MarkerEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Marker<wbr/>Event</span></a>
+<a href="classes/NoteEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Note<wbr/>Event</span></a>
+<a href="classes/NoteOffEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Note<wbr/>Off<wbr/>Event</span></a>
+<a href="classes/NoteOnEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Note<wbr/>On<wbr/>Event</span></a>
+<a href="classes/PitchBendEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Pitch<wbr/>Bend<wbr/>Event</span></a>
+<a href="classes/ProgramChangeEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Program<wbr/>Change<wbr/>Event</span></a>
+<a href="classes/TempoEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Tempo<wbr/>Event</span></a>
+<a href="classes/TextEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Text<wbr/>Event</span></a>
+<a href="classes/TimeSignatureEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Time<wbr/>Signature<wbr/>Event</span></a>
+<a href="classes/Track.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Track</span></a>
+<a href="classes/TrackNameEvent.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Track<wbr/>Name<wbr/>Event</span></a>
+<a href="classes/Utils.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Utils</span></a>
+<a href="classes/VexFlow.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Vex<wbr/>Flow</span></a>
+<a href="classes/Writer.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-128"></use></svg><span>Writer</span></a>
+</div></section>
+<section class="tsd-index-section">
+<h3 class="tsd-index-heading">Variables</h3>
+<div class="tsd-index-list"><a href="variables/Constants.html" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>Constants</span></a>
+</div></section></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -160,27 +57,7 @@ street smarts you could also use it for programmatic crescendos and other proper
 <li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><use href="#icon-checkbox"></use></svg><span>Inherited</span></label></li>
 <li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><use href="#icon-checkbox"></use></svg><span>External</span></label></li></ul></form></div>
 <div class="tsd-theme-toggle">
-<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
-<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
-<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
-<div class="tsd-accordion-details">
-<ul>
-<li>
-<ul>
-<li><a href="#md:9836-midiwriterjs"><span>♬ <wbr/>Midi<wbr/>WriterJS</span></a></li>
-<li>
-<ul>
-<li><a href="#md:install"><span>Install</span></a></li>
-<li><a href="#md:getting-started"><span>Getting <wbr/>Started</span></a></li>
-<li><a href="#md:documentation"><span>Documentation</span></a></li>
-<li>
-<ul>
-<li><a href="#md:midiwritertrack"><span>Midi<wbr/>Writer.<wbr/>Track()</span></a></li>
-<li><a href="#md:midiwriternoteeventoptions"><span>Midi<wbr/>Writer.<wbr/>Note<wbr/>Event({options})</span></a></li>
-<li><a href="#md:midiwriterwritertracks"><span>Midi<wbr/>Writer.<wbr/>Writer(tracks)</span></a></li>
-<li><a href="#md:hot-cross-buns"><span>Hot <wbr/>Cross <wbr/>Buns</span></a></li>
-<li><a href="#md:vexflow-integration"><span>Vex<wbr/>Flow <wbr/>Integration</span></a></li></ul></li>
-<li><a href="#md:demos"><span>Demos</span></a></li></ul></li></ul></li></ul></div></details></div>
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1"></use></svg><span>midi-writer-js</span></a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base=".">
