@@ -1,7 +1,13 @@
 {
-    "compilerOptions": {
-        "lib": ["esnext", "dom"],
-        "declaration": true,
-        "declarationDir": "./types"
-    }
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "declaration": true,
+    "declarationDir": "./types"
+  }
 }

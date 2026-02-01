@@ -1,9 +1,17 @@
 {
   "name": "midi-writer-js",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "A library providing an API for generating MIDI files.",
-  "main": "build/index.js",
+  "main": "build/index.cjs",
+  "module": "build/index.mjs",
   "types": "build/types/main.d.ts",
+  "exports": {
+    ".": {
+      "import": "./build/index.mjs",
+      "require": "./build/index.cjs",
+      "types": "./build/types/main.d.ts"
+    }
+  },
   "dependencies": {
     "@tonaljs/midi": "^4.9.0"
   },

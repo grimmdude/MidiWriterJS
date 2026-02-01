@@ -1,5 +1,5 @@
-import {MidiEvent} from './midi-event';
-import {Utils} from '../utils';
+import { MidiEvent } from './midi-event';
+import { Utils } from '../utils';
 
 /**
  * Holds all data for a "note on" MIDI event
@@ -12,22 +12,22 @@ class NoteOnEvent implements MidiEvent {
 	delta: number;
 	status: 0x90;
 	name: string;
-	pitch: string|string[]|number|number[];
+	pitch: string | number;
 	velocity: number;
-	wait: string|number;
+	wait: string | number;
 	tick: number;
 	deltaWithPrecisionCorrection: number;
 
-	constructor(fields: { channel?: number; wait?: string|number; velocity?: number; pitch?: string|string[]|number|number[]; tick?: number; data?: number[]; delta?: number }) {
-		this.name 		= 'NoteOnEvent';
-		this.channel 	= fields.channel || 1;
-		this.pitch 		= fields.pitch;
-		this.wait 		= fields.wait || 0;
-		this.velocity 	= fields.velocity || 50;
+	constructor(fields: { channel?: number; wait?: string | number; velocity?: number; pitch?: string | number; tick?: number; data?: number[]; delta?: number }) {
+		this.name = 'NoteOnEvent';
+		this.channel = fields.channel || 1;
+		this.pitch = fields.pitch;
+		this.wait = fields.wait || 0;
+		this.velocity = fields.velocity || 50;
 
-		this.tick 		= fields.tick || null;
-		this.delta 		= null;
-		this.data 		= fields.data;
+		this.tick = fields.tick || null;
+		this.delta = null;
+		this.data = fields.data;
 		this.status = 0x90;
 	}
 
@@ -36,7 +36,7 @@ class NoteOnEvent implements MidiEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOnEvent}
 	 */
-	buildData(track, precisionDelta, options: {middleC?: string} = {}) {
+	buildData(track, precisionDelta, options: { middleC?: string } = {}) {
 		this.data = [];
 
 		// Explicitly defined startTick event
@@ -56,14 +56,14 @@ class NoteOnEvent implements MidiEvent {
 		this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
 
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
-					.concat(
-						this.status | this.channel - 1,
-							Utils.getPitch(this.pitch, options.middleC),
-							Utils.convertVelocity(this.velocity)
-					);
+			.concat(
+				this.status | this.channel - 1,
+				Utils.getPitch(this.pitch, options.middleC),
+				Utils.convertVelocity(this.velocity)
+			);
 
 		return this;
 	}
 }
 
-export {NoteOnEvent};
+export { NoteOnEvent };

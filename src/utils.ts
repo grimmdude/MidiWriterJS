@@ -1,5 +1,5 @@
-import {Constants} from './constants';
-import {toMidi} from '@tonaljs/midi';
+import { Constants } from './constants';
+import { toMidi } from '@tonaljs/midi';
 
 /**
  * Static utility functions used throughout the library.
@@ -40,7 +40,7 @@ class Utils {
 	 * @param {string} middleC
 	 * @return {number}
 	 */
-	static getPitch(pitch: any, middleC = 'C4'): number {
+	static getPitch(pitch: string | number, middleC: string | number = 'C4'): number {
 		return 60 - toMidi(middleC) + toMidi(pitch);
 	}
 
@@ -241,7 +241,7 @@ class Utils {
 				// how much faster or slower is this note compared to a quarter?
 				const ratio = base / 4;
 				let durationInQuarters = 1 / ratio;
-				const {dotted, tuplet} = match.groups;
+				const { dotted, tuplet } = match.groups;
 				if (dotted) {
 					const thisManyDots = dotted.length;
 					const divisor = Math.pow(2, thisManyDots);
@@ -260,4 +260,4 @@ class Utils {
 	}
 }
 
-export {Utils};
+export { Utils };
