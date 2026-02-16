@@ -182,19 +182,30 @@ class Track implements Chunk {
 			lastEventIndex = i;
 		}
 
-		const splicedEventIndex = lastEventIndex + 1;
+		if (lastEventIndex === undefined) {
+			// This event needs to be inserted before all existing events.
+			event.delta = event.tick;
+			this.events.splice(0, 0, event);
 
-		// Need to adjust the delta of this event to ensure it falls on the correct tick.
-		event.delta = event.tick - this.events[lastEventIndex].tick;
+			// Adjust delta of the event that now follows the inserted one.
+			if (this.events.length > 1) {
+				this.events[1].delta = this.events[1].tick - event.tick;
+			}
+		} else {
+			const splicedEventIndex = lastEventIndex + 1;
 
-		// Splice this event at lastEventIndex + 1
-		this.events.splice(splicedEventIndex, 0, event);
+			// Need to adjust the delta of this event to ensure it falls on the correct tick.
+			event.delta = event.tick - this.events[lastEventIndex].tick;
 
-		// Now adjust delta of all following events
-		for (let i = splicedEventIndex + 1; i < this.events.length; i++) {
-			// Since each existing event should have a tick value at this point we just need to
-			// adjust delta to that the event still falls on the correct tick.
-			this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
+			// Splice this event at lastEventIndex + 1
+			this.events.splice(splicedEventIndex, 0, event);
+
+			// Now adjust delta of all following events
+			for (let i = splicedEventIndex + 1; i < this.events.length; i++) {
+				// Since each existing event should have a tick value at this point we just need to
+				// adjust delta to that the event still falls on the correct tick.
+				this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
+			}
 		}
 	}
 

@@ -250,6 +250,28 @@ describe('MidiWriterJS', function() {
 			assert.equal('TVRoZAAAAAYAAAABAIBNVHJrAAAAHwCQPECBAIA8QACQPkCBAIA+QACQQECBAIBAQAD/LwA=', write.base64());
 		});
 
+		it('should not crash when merging a track whose events have earlier ticks', function() {
+			const track1 = new MidiWriter.Track();
+			track1.addEvent(new MidiWriter.NoteEvent({pitch: ['A3'], duration: 'T96', wait: 'T256'}));
+			const track2 = new MidiWriter.Track();
+			track2.addEvent(new MidiWriter.NoteEvent({pitch: ['B3'], duration: 'T96', wait: 'T128'}));
+			track1.mergeTrack(track2);
+			const write = new MidiWriter.Writer([track1]);
+			assert.ok(write.base64());
+		});
+
+		it('should not crash when merging into an empty track', function() {
+			const track = new MidiWriter.Track();
+			const track1 = new MidiWriter.Track();
+			track1.addEvent(new MidiWriter.NoteEvent({pitch: ['A3'], duration: 'T96', wait: 'T256'}));
+			track.mergeTrack(track1);
+			const track2 = new MidiWriter.Track();
+			track2.addEvent(new MidiWriter.NoteEvent({pitch: ['B3'], duration: 'T96', wait: 'T128'}));
+			track.mergeTrack(track2);
+			const write = new MidiWriter.Writer([track]);
+			assert.ok(write.base64());
+		});
+
 		it('should return specific base64 string when merging two tracks', function() {
 			const track = new MidiWriter.Track();
 
