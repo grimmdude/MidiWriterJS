@@ -250,6 +250,29 @@ describe('MidiWriterJS', function() {
 			assert.equal('TVRoZAAAAAYAAAABAIBNVHJrAAAAHwCQPECBAIA8QACQPkCBAIA+QACQQECBAIBAQAD/LwA=', write.base64());
 		});
 
+		it('should return specific base64 string when merging two tracks with meta events', function() {
+			const track = new MidiWriter.Track();
+			track.addTrackName('Track 1');
+
+			track.addEvent([
+				new MidiWriter.NoteEvent({pitch: ['E4','D4'], duration: '4', sequential: true}),
+				new MidiWriter.NoteEvent({pitch: 'C4', duration: '2'})
+			]);
+
+			const track2 = new MidiWriter.Track();
+			track2.addTrackName('Track 2');
+
+			track2.addEvent([
+				new MidiWriter.NoteEvent({pitch: ['G4','F4'], duration: '4', sequential: true}),
+				new MidiWriter.NoteEvent({pitch: 'E4', duration: '2'})
+			]);
+
+			track.mergeTrack(track2);
+			const write = new MidiWriter.Writer([track]);
+
+			assert.equal('TVRoZAAAAAYAAAABAIBNVHJrAAAATQD/AwdUcmFjayAxAJBAQAD/AwdUcmFjayAyAJBDQIEAgEBAAJA+QACAQ0AAkEFAgQCAPkAAkDxAAIBBQACQQECCAIA8QACAQEAA/y8A', write.base64());
+		});
+
 		it('should not crash when merging a track whose events have earlier ticks', function() {
 			const track1 = new MidiWriter.Track();
 			track1.addEvent(new MidiWriter.NoteEvent({pitch: ['A3'], duration: 'T96', wait: 'T256'}));
