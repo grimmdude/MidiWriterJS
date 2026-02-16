@@ -109,6 +109,7 @@ class Track implements Chunk {
 				this.data = this.data.concat(event.data);
 
 			} else {
+				event.tick = this.tickPointer;
 				this.data = this.data.concat(event.data);
 			}
 		});
