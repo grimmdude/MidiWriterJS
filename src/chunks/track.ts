@@ -113,16 +113,16 @@ class Track implements Chunk {
 			if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
 				const built = event.buildData(this, precisionLoss, options);
 				precisionLoss = Utils.getPrecisionLoss(event.deltaWithPrecisionCorrection || 0);
-				this.data = this.data.concat(built.data);
+				this.data.push(...built.data);
 				this.tickPointer = Utils.getRoundedIfClose(event.tick);
 
 			} else if (event instanceof TempoEvent) {
 				this.tickPointer = Utils.getRoundedIfClose(event.tick);
-				this.data = this.data.concat(event.data);
+				this.data.push(...event.data);
 
 			} else {
 				event.tick = this.tickPointer;
-				this.data = this.data.concat(event.data);
+				this.data.push(...event.data);
 			}
 		});
 
@@ -130,7 +130,7 @@ class Track implements Chunk {
 
 		// If the last event isn't EndTrackEvent, then tack it onto the data.
 		if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
-			this.data = this.data.concat((new EndTrackEvent).data);
+			this.data.push(...(new EndTrackEvent).data);
 		}
 
 		this.size = Utils.numberToBytes(this.data.length, 4); // 4 bytes long

@@ -43,7 +43,7 @@ class Writer {
 		let build = [];
 
 		// Data consists of chunks which consists of data
-		this.buildData().forEach((d) => build = build.concat(d.type, d.size, d.data));
+		this.buildData().forEach((d) => build.push(...d.type, ...d.size, ...d.data));
 
 		return new Uint8Array(build);
 	}
@@ -54,15 +54,15 @@ class Writer {
 	 */
 	base64(): string {
 		if (typeof btoa === 'function') {
-			let binary = '';
 			const bytes = this.buildFile();
 			const len = bytes.byteLength;
+			const chars = new Array(len);
 
 			for (let i = 0; i < len; i++) {
-				binary += String.fromCharCode(bytes[i]);
+				chars[i] = String.fromCharCode(bytes[i]);
 			}
 
-			return btoa(binary);
+			return btoa(chars.join(''));
 		}
 
 		return Buffer.from(this.buildFile()).toString('base64');

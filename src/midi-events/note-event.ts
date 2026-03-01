@@ -64,7 +64,7 @@ class NoteEvent implements AbstractEvent {
 			this.grace = Utils.toArray(this.grace);
 			this.grace.forEach(() => {
 				const noteEvent = new NoteEvent({pitch: this.grace, duration:'T' + graceDuration});
-				this.data = this.data.concat(noteEvent.data);
+				this.data.push(...noteEvent.data);
 			});
 		}
 
