@@ -71,7 +71,23 @@ class VexFlow {
 	 * @param note struct from VexFlow
 	 */
 	convertDuration(note) {
-		return 'd'.repeat(note.dots) + this.convertBaseDuration(note.duration) + (note.tuplet ? 't' + note.tuplet.num_notes : '');
+		const dots = this.countDots(note);
+		return 'd'.repeat(dots) + this.convertBaseDuration(note.duration) + (note.tuplet ? 't' + note.tuplet.num_notes : '');
+	}
+
+	/**
+	 * Counts the number of dots on a VexFlow note by checking modifiers
+	 * @param note struct from VexFlow
+	 * @returns number of dots
+	 */
+	countDots(note): number {
+		if (typeof note.getModifiersByType === 'function') {
+			return note.getModifiersByType('Dot').length;
+		}
+		if (Array.isArray(note.modifiers)) {
+			return note.modifiers.filter(m => m.getCategory?.() === 'dots' || m.attrs?.type === 'Dot').length;
+		}
+		return note.dots || 0;
 	}
 
 	/**
