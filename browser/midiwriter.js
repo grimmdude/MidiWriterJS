@@ -1250,7 +1250,22 @@ var MidiWriter = (function () {
          * @param note struct from VexFlow
          */
         VexFlow.prototype.convertDuration = function (note) {
-            return 'd'.repeat(note.dots) + this.convertBaseDuration(note.duration) + (note.tuplet ? 't' + note.tuplet.num_notes : '');
+            var dots = this.countDots(note);
+            return 'd'.repeat(dots) + this.convertBaseDuration(note.duration) + (note.tuplet ? 't' + note.tuplet.num_notes : '');
+        };
+        /**
+         * Counts the number of dots on a VexFlow note by checking modifiers
+         * @param note struct from VexFlow
+         * @returns number of dots
+         */
+        VexFlow.prototype.countDots = function (note) {
+            if (typeof note.getModifiersByType === 'function') {
+                return note.getModifiersByType('Dot').length;
+            }
+            if (Array.isArray(note.modifiers)) {
+                return note.modifiers.filter(function (m) { var _a, _b; return ((_a = m.getCategory) === null || _a === void 0 ? void 0 : _a.call(m)) === 'dots' || ((_b = m.attrs) === null || _b === void 0 ? void 0 : _b.type) === 'Dot'; }).length;
+            }
+            return note.dots || 0;
         };
         /**
          * Converts VexFlow base duration syntax to MidiWriterJS syntax
