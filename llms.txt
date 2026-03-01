@@ -58,6 +58,14 @@ writer.dataUri();     // data URI for playback/download
 
 **Save to file (Node.js):** `fs.writeFileSync('output.mid', writer.buildFile())`.
 
+## See Also
+
+MidiWriterJS is part of a MIDI toolkit by the same author:
+
+- [MidiPlayerJS](https://github.com/grimmdude/MidiPlayerJS) (`npm install midi-player-js`) — MIDI parser and player engine for the browser and Node.js. Parses MIDI files and emits JSON events in real time for playback, visualization, or analysis.
+
+Use MidiWriterJS to **generate** MIDI files and MidiPlayerJS to **parse and play** them.
+
 ## Links
 
 - [npm](https://www.npmjs.com/package/midi-writer-js)

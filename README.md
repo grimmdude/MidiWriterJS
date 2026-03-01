@@ -305,6 +305,13 @@ const writer = new MidiWriter.Writer([track]);
 console.log(writer.dataUri());
 ```
 
+## See Also
+
+Need to parse or play MIDI files? Check out [MidiPlayerJS](https://github.com/grimmdude/MidiPlayerJS) — a MIDI parser and player engine for the browser and Node.js. Together they form a complete MIDI toolkit:
+
+- **MidiWriterJS** — generate MIDI files programmatically
+- **MidiPlayerJS** — parse and play MIDI files with real-time event callbacks
+
 ## Demos
 
 - [Example with Magenta player](https://codepen.io/dirkk0/pen/rNZLXjZ) by Dirk Krause [@dirkk0](https://github.com/dirkk0)
