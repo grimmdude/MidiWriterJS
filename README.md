@@ -164,78 +164,18 @@ console.log(writer.dataUri());
 
 ### `NoteEvent` Options
 
-<table>
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Type</th>
-			<th>Default</th>
-			<th>Description</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td><b>pitch</b></td>
-			<td>string or array</td>
-			<td></td>
-			<td>Each pitch can be a string or valid MIDI note code.  Format for string is <code>C#4</code>.  You can use the output from <a href="https://github.com/tonaljs/tonal" target="_blank">tonal</a> to build scales, chords, etc.</td>
-		</tr>
-		<tr>
-			<td><b>duration</b></td>
-			<td>string or array</td>
-			<td><code>'4'</code></td>
-			<td>How long the note should sound (see <a href="#duration-values">Duration Values</a>). If an array of durations is passed then the sum will be used.</td>
-		</tr>
-		<tr>
-			<td><b>wait</b></td>
-			<td>string or array</td>
-			<td><code>0</code></td>
-			<td>Rest before sounding note. Takes same values as <b>duration</b>.</td>
-		</tr>
-		<tr>
-			<td><b>sequential</b></td>
-			<td>boolean</td>
-			<td><code>false</code></td>
-			<td>If <code>true</code>, array of pitches plays sequentially instead of as a chord.</td>
-		</tr>
-		<tr>
-			<td><b>velocity</b></td>
-			<td>number</td>
-			<td><code>50</code></td>
-			<td>How loud the note should sound, values 1-100.</td>
-		</tr>
-		<tr>
-			<td><b>repeat</b></td>
-			<td>number</td>
-			<td><code>1</code></td>
-			<td>How many times this event should repeat.</td>
-		</tr>
-		<tr>
-			<td><b>channel</b></td>
-			<td>number</td>
-			<td><code>1</code></td>
-			<td>MIDI channel to use (1-16).</td>
-		</tr>
-		<tr>
-			<td><b>grace</b></td>
-			<td>string or array</td>
-			<td></td>
-			<td>Grace note(s) applied before the main note. Takes same format as <code>pitch</code>.</td>
-		</tr>
-		<tr>
-			<td><b>startTick</b></td>
-			<td>number</td>
-			<td></td>
-			<td>Explicit tick position for this event. If supplied, <code>wait</code> is ignored.</td>
-		</tr>
-		<tr>
-			<td><b>tick</b></td>
-			<td>number</td>
-			<td></td>
-			<td>Alias for <code>startTick</code>.</td>
-		</tr>
-	</tbody>
-</table>
+| Name | Type | Default | Description |
+|---|---|---|---|
+| **pitch** | string or array | | Each pitch can be a string or valid MIDI note code. Format for string is `C#4`. You can use the output from [tonal](https://github.com/tonaljs/tonal) to build scales, chords, etc. |
+| **duration** | string or array | `'4'` | How long the note should sound (see [Duration Values](#duration-values)). If an array of durations is passed then the sum will be used. |
+| **wait** | string or array | `0` | Rest before sounding note. Takes same values as **duration**. |
+| **sequential** | boolean | `false` | If `true`, array of pitches plays sequentially instead of as a chord. |
+| **velocity** | number | `50` | How loud the note should sound, values 1-100. |
+| **repeat** | number | `1` | How many times this event should repeat. |
+| **channel** | number | `1` | MIDI channel to use (1-16). |
+| **grace** | string or array | | Grace note(s) applied before the main note. Takes same format as `pitch`. |
+| **startTick** | number | | Explicit tick position for this event. If supplied, `wait` is ignored. |
+| **tick** | number | | Alias for `startTick`. |
 
 ### `Writer`
 
@@ -292,6 +232,64 @@ See the [full API documentation](https://grimmdude.com/MidiWriterJS/docs/) for d
 | `32` | Thirty-second |
 | `64` | Sixty-fourth |
 | `Tn` | Explicit number of ticks (e.g., `T128` = 1 beat) |
+
+## Recipes
+
+### Rests
+
+Use the `wait` property to add silence before a note. There is no dedicated rest event — `wait` accepts the same [duration values](#duration-values) as `duration`.
+
+```javascript
+// Quarter rest followed by a quarter note
+track.addEvent(new MidiWriter.NoteEvent({pitch: 'C4', duration: '4', wait: '4'}));
+
+// Half rest followed by a whole note
+track.addEvent(new MidiWriter.NoteEvent({pitch: 'E4', duration: '1', wait: '2'}));
+```
+
+### Drums (Channel 10)
+
+MIDI channel 10 is reserved for percussion. Pitch values map to drum sounds (e.g., `C2` = kick, `D2` = snare, `F#2` = hi-hat).
+
+```javascript
+const drums = new MidiWriter.Track();
+drums.addTrackName('Drums');
+drums.addEvent(new MidiWriter.NoteEvent({pitch: ['C2'], duration: '4', channel: 10, velocity: 80}));
+drums.addEvent(new MidiWriter.NoteEvent({pitch: ['D2'], duration: '4', channel: 10, velocity: 80}));
+drums.addEvent(new MidiWriter.NoteEvent({pitch: ['F#2'], duration: '8', channel: 10, repeat: 4}));
+```
+
+### Dynamics (Velocity)
+
+Control note loudness with `velocity` (1-100). Simulate a crescendo by gradually increasing velocity.
+
+```javascript
+track.addEvent(new MidiWriter.NoteEvent({pitch: 'C4', duration: '4', velocity: 30}));  // piano
+track.addEvent(new MidiWriter.NoteEvent({pitch: 'E4', duration: '4', velocity: 60}));  // mezzo-forte
+track.addEvent(new MidiWriter.NoteEvent({pitch: 'G4', duration: '4', velocity: 100})); // fortissimo
+```
+
+### Tempo Changes
+
+Set tempo at the start of a track, or change it mid-track by specifying a tick position.
+
+```javascript
+track.setTempo(120);         // 120 BPM from the start
+track.setTempo(80, 512);     // slow to 80 BPM at tick 512
+```
+
+### Saving to a File (Node.js)
+
+```javascript
+import fs from 'fs';
+import MidiWriter from 'midi-writer-js';
+
+const track = new MidiWriter.Track();
+track.addEvent(new MidiWriter.NoteEvent({pitch: ['C4', 'E4', 'G4'], duration: '1'}));
+
+const writer = new MidiWriter.Writer(track);
+fs.writeFileSync('output.mid', writer.buildFile());
+```
 
 ## VexFlow Integration
 

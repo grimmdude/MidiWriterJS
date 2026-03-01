@@ -1,6 +1,6 @@
-var MidiWriter = require('..');
+import MidiWriter from 'midi-writer-js';
 
-var tracks = [];
+const tracks = [];
 tracks[0] = new MidiWriter.Track();
 
 // You can chain track methods.
@@ -136,8 +136,5 @@ tracks[1].addEvent(new MidiWriter.NoteEvent({pitch: ['B3', 'B2'], duration: '2',
 tracks[1].addEvent(new MidiWriter.NoteEvent({pitch: ['B3', 'F#3', 'B2'], duration: '2'}));
 tracks[1].addEvent(new MidiWriter.NoteEvent({pitch: ['E2', 'E1'], duration: '1'}));
 
-var write = new MidiWriter.Writer(tracks);
-console.log(write.dataUri());
-//write.stdout();
-
-module.exports = write;
+const writer = new MidiWriter.Writer(tracks);
+console.log(writer.dataUri());

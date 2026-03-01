@@ -56,8 +56,15 @@
   },
   "keywords": [
     "midi",
+    "midi-file",
+    "midi-writer",
     "generator",
-    "music"
+    "music",
+    "music-generation",
+    "programmatic-midi",
+    "audio",
+    "note",
+    "smf"
   ],
   "author": "Garrett Grimm",
   "license": "MIT",

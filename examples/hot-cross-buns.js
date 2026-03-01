@@ -1,6 +1,6 @@
-var MidiWriter = require('..');
+import MidiWriter from 'midi-writer-js';
 
-var track = new MidiWriter.Track();
+const track = new MidiWriter.Track();
 
 track.addEvent([
 			new MidiWriter.NoteEvent({pitch: ['E4','D4'], duration: '4'}),
@@ -15,10 +15,5 @@ track.addEvent([
   }
 );
 
-
-var write = new MidiWriter.Writer(track);
-//console.log(track);
-//console.log(write.base64())
-console.log(write.dataUri());
-
-module.exports = write;
+const writer = new MidiWriter.Writer(track);
+console.log(writer.dataUri());

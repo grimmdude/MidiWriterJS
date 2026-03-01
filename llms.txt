@@ -1,0 +1,65 @@
+# MidiWriterJS
+
+> A JavaScript library for programmatically generating expressive multi-track MIDI files.
+
+MidiWriterJS provides a high-level API for creating MIDI files in Node.js (CJS & ESM) and the browser. It supports note names (`C#4`, `Eb5`) or raw MIDI numbers, chords, arpeggios, grace notes, pitch bends, controller changes, tempo/time signature/key signature events, and multi-track output.
+
+## Install
+
+```
+npm install midi-writer-js
+```
+
+## Quick Start
+
+```javascript
+import MidiWriter from 'midi-writer-js';
+
+const track = new MidiWriter.Track();
+track.addEvent(new MidiWriter.NoteEvent({pitch: ['C4', 'D4', 'E4'], duration: '4', sequential: true}));
+
+const writer = new MidiWriter.Writer(track);
+writer.buildFile();   // Uint8Array
+writer.base64();      // base64 string
+writer.dataUri();     // data URI for playback/download
+```
+
+## Core Classes
+
+- `Track` — Container for MIDI events. Methods: `addEvent()`, `setTempo()`, `setTimeSignature()`, `setKeySignature()`, `addTrackName()`, `addText()`, `addMarker()`, `addLyric()`, `controllerChange()`, `setPitchBend()`, `mergeTrack()`, `removeEventsByName()`.
+- `Writer` — Assembles tracks into a MIDI file. Pass a single Track or array of Tracks. Methods: `buildFile()`, `base64()`, `dataUri()`, `stdout()`, `setOption()`.
+- `NoteEvent` — High-level note event. Options: `pitch` (string/array), `duration` (string/array), `wait` (string/array, rest before note), `sequential` (boolean, play pitches one after another instead of as chord), `velocity` (1-100), `channel` (1-16), `repeat` (number), `grace` (string/array), `startTick`/`tick` (explicit tick position).
+- `ProgramChangeEvent` — Change instrument. Options: `instrument` (0-127 General MIDI program number).
+- `ControllerChangeEvent` — CC event. Options: `controllerNumber`, `controllerValue`, `channel`, `delta`.
+- `PitchBendEvent` — Pitch bend. Options: `bend` (-1.0 to 1.0).
+- `TempoEvent` — Set tempo. Options: `bpm`, `tick`.
+- `TimeSignatureEvent` — Set time signature.
+- `KeySignatureEvent` — Set key signature.
+- Meta events: `TextEvent`, `CopyrightEvent`, `TrackNameEvent`, `InstrumentNameEvent`, `MarkerEvent`, `CuePointEvent`, `LyricEvent`.
+- Raw events: `NoteOnEvent`, `NoteOffEvent` (usually you want `NoteEvent` instead).
+
+## Duration Values
+
+`1` (whole), `2` (half), `d2` (dotted half), `4` (quarter), `4t` (quarter triplet), `d4` (dotted quarter), `8` (eighth), `8t` (eighth triplet), `d8` (dotted eighth), `16` (sixteenth), `16t` (sixteenth triplet), `32`, `64`. Prefix `dd` for double dotted (e.g. `dd4`). Use `T` prefix for explicit ticks (e.g. `T128` = 1 beat at default 128 ticks/beat).
+
+## Common Patterns
+
+**Rest/silence:** Use the `wait` property on a NoteEvent: `{pitch: 'C4', duration: '4', wait: '4'}` (quarter rest then quarter note).
+
+**Drums (channel 10):** `new NoteEvent({pitch: ['C2'], duration: '8', channel: 10})` — MIDI channel 10 is the percussion channel.
+
+**Chords vs sequential:** By default, an array of pitches plays as a chord. Set `sequential: true` to play them one after another.
+
+**Velocity/dynamics:** Set `velocity` (1-100): `{pitch: 'C4', duration: '4', velocity: 100}` for forte, `velocity: 30` for piano.
+
+**Tempo changes:** Call `track.setTempo(bpm)` at the start, or `track.setTempo(bpm, tick)` for mid-track tempo changes.
+
+**Multi-track:** `new MidiWriter.Writer([track1, track2])` — pass an array of tracks.
+
+**Save to file (Node.js):** `fs.writeFileSync('output.mid', writer.buildFile())`.
+
+## Links
+
+- [npm](https://www.npmjs.com/package/midi-writer-js)
+- [GitHub](https://github.com/grimmdude/MidiWriterJS)
+- [Full API Documentation](https://grimmdude.com/MidiWriterJS/docs/)
