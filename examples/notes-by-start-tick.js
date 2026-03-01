@@ -42,3 +42,4 @@ track.addEvent([
 
 const writer = new MidiWriter.Writer(track);
 console.log(writer.dataUri());
+export default writer;

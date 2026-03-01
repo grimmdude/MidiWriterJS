@@ -1062,12 +1062,7 @@ var MidiWriter = (function () {
          * @return {Track}
          */
         Track.prototype.removeEventsByName = function (eventName) {
-            var _this = this;
-            this.events.forEach(function (event, index) {
-                if (event.name === eventName) {
-                    _this.events.splice(index, 1);
-                }
-            });
+            this.events = this.events.filter(function (event) { return event.name !== eventName; });
             return this;
         };
         /**

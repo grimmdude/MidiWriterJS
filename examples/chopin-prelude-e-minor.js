@@ -138,3 +138,4 @@ tracks[1].addEvent(new MidiWriter.NoteEvent({pitch: ['E2', 'E1'], duration: '1'}
 
 const writer = new MidiWriter.Writer(tracks);
 console.log(writer.dataUri());
+export default writer;

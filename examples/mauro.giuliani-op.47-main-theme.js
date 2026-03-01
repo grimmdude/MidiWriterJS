@@ -81,3 +81,4 @@ tracks[2].addEvent(new MidiWriter.NoteEvent({wait: '4', pitch: ['A3'], duration:
 
 const writer = new MidiWriter.Writer(tracks);
 console.log(writer.dataUri());
+export default writer;
