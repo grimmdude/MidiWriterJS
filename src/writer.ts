@@ -19,7 +19,7 @@ class Writer {
 	}
 
 	/**
-	 * Builds array of data from chunkschunks.
+	 * Builds array of data from chunks.
 	 * @return {array}
 	 */
 	buildData() {

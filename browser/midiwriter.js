@@ -1305,7 +1305,7 @@ var MidiWriter = (function () {
             this.options = options;
         }
         /**
-         * Builds array of data from chunkschunks.
+         * Builds array of data from chunks.
          * @return {array}
          */
         Writer.prototype.buildData = function () {
