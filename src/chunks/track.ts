@@ -184,7 +184,7 @@ class Track implements Chunk {
 		// There are no events yet, so just add it in.
 		if (!this.events.length) {
 			this.addEvent(event);
-			return;
+			return this;
 		}
 
 		// Find index of existing event we need to follow with
@@ -220,6 +220,8 @@ class Track implements Chunk {
 				this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
 			}
 		}
+
+		return this;
 	}
 
 	/**
