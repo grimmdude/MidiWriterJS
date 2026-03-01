@@ -659,8 +659,9 @@ var MidiWriter = (function () {
                 var graceDuration_1 = 1;
                 this.grace = Utils.toArray(this.grace);
                 this.grace.forEach(function () {
+                    var _a;
                     var noteEvent = new NoteEvent({ pitch: _this.grace, duration: 'T' + graceDuration_1 });
-                    _this.data = _this.data.concat(noteEvent.data);
+                    (_a = _this.data).push.apply(_a, noteEvent.data);
                 });
             }
             // fields.pitch could be an array of pitches.
@@ -934,6 +935,7 @@ var MidiWriter = (function () {
          * @return {Track}
          */
         Track.prototype.buildData = function (options) {
+            var _a;
             var _this = this;
             if (options === void 0) { options = {}; }
             // Reset
@@ -953,26 +955,27 @@ var MidiWriter = (function () {
             this.events = expandedEvents;
             var precisionLoss = 0;
             this.events.forEach(function (event) {
+                var _a, _b, _c;
                 // Build event & add to total tick duration
                 if (event instanceof NoteOnEvent || event instanceof NoteOffEvent) {
                     var built = event.buildData(_this, precisionLoss, options);
                     precisionLoss = Utils.getPrecisionLoss(event.deltaWithPrecisionCorrection || 0);
-                    _this.data = _this.data.concat(built.data);
+                    (_a = _this.data).push.apply(_a, built.data);
                     _this.tickPointer = Utils.getRoundedIfClose(event.tick);
                 }
                 else if (event instanceof TempoEvent) {
                     _this.tickPointer = Utils.getRoundedIfClose(event.tick);
-                    _this.data = _this.data.concat(event.data);
+                    (_b = _this.data).push.apply(_b, event.data);
                 }
                 else {
                     event.tick = _this.tickPointer;
-                    _this.data = _this.data.concat(event.data);
+                    (_c = _this.data).push.apply(_c, event.data);
                 }
             });
             this.mergeExplicitTickEvents(options);
             // If the last event isn't EndTrackEvent, then tack it onto the data.
             if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
-                this.data = this.data.concat((new EndTrackEvent).data);
+                (_a = this.data).push.apply(_a, (new EndTrackEvent).data);
             }
             this.size = Utils.numberToBytes(this.data.length, 4); // 4 bytes long
             return this;
@@ -1274,6 +1277,31 @@ var MidiWriter = (function () {
         return VexFlow;
     }());
 
+    /******************************************************************************
+    Copyright (c) Microsoft Corporation.
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
+
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
+    ***************************************************************************** */
+
+    function __spreadArray(to, from, pack) {
+        if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+            if (ar || !(i in from)) {
+                if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+                ar[i] = from[i];
+            }
+        }
+        return to.concat(ar || Array.prototype.slice.call(from));
+    }
+
     /**
      * Object representation of a header chunk section of a MIDI file.
      * @param {number} numberOfTracks - Number of tracks
@@ -1326,7 +1354,7 @@ var MidiWriter = (function () {
         Writer.prototype.buildFile = function () {
             var build = [];
             // Data consists of chunks which consists of data
-            this.buildData().forEach(function (d) { return build = build.concat(d.type, d.size, d.data); });
+            this.buildData().forEach(function (d) { return build.push.apply(build, __spreadArray(__spreadArray(__spreadArray([], d.type, false), d.size, false), d.data, false)); });
             return new Uint8Array(build);
         };
         /**
@@ -1335,13 +1363,13 @@ var MidiWriter = (function () {
          */
         Writer.prototype.base64 = function () {
             if (typeof btoa === 'function') {
-                var binary = '';
                 var bytes = this.buildFile();
                 var len = bytes.byteLength;
+                var chars = new Array(len);
                 for (var i = 0; i < len; i++) {
-                    binary += String.fromCharCode(bytes[i]);
+                    chars[i] = String.fromCharCode(bytes[i]);
                 }
-                return btoa(binary);
+                return btoa(chars.join(''));
             }
             return Buffer.from(this.buildFile()).toString('base64');
         };
