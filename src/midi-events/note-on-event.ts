@@ -36,8 +36,9 @@ class NoteOnEvent implements MidiEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOnEvent}
 	 */
-	buildData(track, precisionDelta, options: {middleC?: string} = {}) {
+	buildData(track, precisionDelta, options: {middleC?: string, ticksPerBeat?: number} = {}) {
 		this.data = [];
+		const ticksPerBeat = options.ticksPerBeat || 128;
 
 		// Explicitly defined startTick event
 		if (this.tick) {
@@ -49,7 +50,7 @@ class NoteOnEvent implements MidiEvent {
 			}
 
 		} else {
-			this.delta = Utils.getTickDuration(this.wait);
+			this.delta = Utils.getTickDuration(this.wait, ticksPerBeat);
 			this.tick = Utils.getRoundedIfClose(track.tickPointer + this.delta);
 		}
 

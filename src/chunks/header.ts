@@ -12,14 +12,14 @@ class Header implements Chunk {
 	type: number[];
 	size: number[];
 
-	constructor(numberOfTracks) {
+	constructor(numberOfTracks: number, ticksPerBeat = 128) {
 		this.type = Constants.HEADER_CHUNK_TYPE;
 
 		const trackType = numberOfTracks > 1? Constants.HEADER_CHUNK_FORMAT1 : Constants.HEADER_CHUNK_FORMAT0;
 
 		this.data = trackType.concat(
 					Utils.numberToBytes(numberOfTracks, 2), // two bytes long,
-					Constants.HEADER_CHUNK_DIVISION
+					Utils.numberToBytes(ticksPerBeat, 2)
 		);
 
 		this.size = [0, 0, 0, this.data.length];

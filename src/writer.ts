@@ -5,7 +5,7 @@ import {Utils} from './utils';
 /**
  * Object that puts together tracks and provides methods for file output.
  * @param {array|Track} tracks - A single {Track} object or an array of {Track} objects.
- * @param {object} options - {middleC: 'C4'}
+ * @param {object} options - {middleC: 'C4', ticksPerBeat: 128}
  * @return {Writer}
  */
 class Writer {
@@ -19,12 +19,13 @@ class Writer {
 	}
 
 	/**
-	 * Builds array of data from chunkschunks.
+	 * Builds array of data from chunks.
 	 * @return {array}
 	 */
 	buildData() {
 		const data = [];
-		data.push(new Header(this.tracks.length))
+		const ticksPerBeat = this.options['ticksPerBeat'] || 128;
+		data.push(new Header(this.tracks.length, ticksPerBeat))
 
 		// For each track add final end of track event and build data
 		this.tracks.forEach((track) => {

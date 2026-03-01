@@ -133,7 +133,7 @@ var MidiWriter = (function () {
          * @return {string}
          */
         Utils.version = function () {
-            return Constants.VERSION;
+            return '3.1.1';
         };
         /**
          * Convert a string to an array of bytes
@@ -266,13 +266,15 @@ var MidiWriter = (function () {
          * Gets the total number of ticks of a specified duration.
          * Note: type=='note' defaults to quarter note, type==='rest' defaults to 0
          * @param {(string|array)} duration
+         * @param {number} ticksPerBeat - Ticks per quarter note (PPQN). Defaults to 128.
          * @return {number}
          */
-        Utils.getTickDuration = function (duration) {
+        Utils.getTickDuration = function (duration, ticksPerBeat) {
+            if (ticksPerBeat === void 0) { ticksPerBeat = 128; }
             if (Array.isArray(duration)) {
                 // Recursively execute this method for each item in the array and return the sum of tick durations.
                 return duration.map(function (value) {
-                    return Utils.getTickDuration(value);
+                    return Utils.getTickDuration(value, ticksPerBeat);
                 }).reduce(function (a, b) {
                     return a + b;
                 }, 0);
@@ -286,9 +288,7 @@ var MidiWriter = (function () {
                 }
                 return ticks;
             }
-            // Need to apply duration here.  Quarter note == Constants.HEADER_CHUNK_DIVISION
-            var quarterTicks = Utils.numberFromBytes(Constants.HEADER_CHUNK_DIVISION);
-            var tickDuration = quarterTicks * Utils.getDurationMultiplier(duration);
+            var tickDuration = ticksPerBeat * Utils.getDurationMultiplier(duration);
             return Utils.getRoundedIfClose(tickDuration);
         };
         /**
@@ -565,6 +565,7 @@ var MidiWriter = (function () {
         NoteOnEvent.prototype.buildData = function (track, precisionDelta, options) {
             if (options === void 0) { options = {}; }
             this.data = [];
+            var ticksPerBeat = options.ticksPerBeat || 128;
             // Explicitly defined startTick event
             if (this.tick) {
                 this.tick = Utils.getRoundedIfClose(this.tick);
@@ -574,7 +575,7 @@ var MidiWriter = (function () {
                 }
             }
             else {
-                this.delta = Utils.getTickDuration(this.wait);
+                this.delta = Utils.getTickDuration(this.wait, ticksPerBeat);
                 this.tick = Utils.getRoundedIfClose(track.tickPointer + this.delta);
             }
             this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
@@ -598,7 +599,7 @@ var MidiWriter = (function () {
             this.velocity = fields.velocity || 50;
             this.tick = fields.tick || null;
             this.data = fields.data;
-            this.delta = fields.delta || Utils.getTickDuration(fields.duration);
+            this.delta = fields.delta !== undefined ? fields.delta : Utils.getTickDuration(fields.duration);
             this.status = 0x80;
         }
         /**
@@ -643,12 +644,16 @@ var MidiWriter = (function () {
         }
         /**
          * Builds int array for this event.
+         * @param {object} options - {ticksPerBeat: number}
          * @return {NoteEvent}
          */
-        NoteEvent.prototype.buildData = function () {
+        NoteEvent.prototype.buildData = function (options) {
             var _this = this;
+            if (options === void 0) { options = {}; }
             // Reset data array
             this.data = [];
+            this.events = [];
+            var ticksPerBeat = options.ticksPerBeat || 128;
             // Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
             if (this.grace) {
                 var graceDuration_1 = 1;
@@ -672,7 +677,7 @@ var MidiWriter = (function () {
                             noteOnNew = new NoteOnEvent({
                                 channel: _this.channel,
                                 wait: _this.wait,
-                                delta: Utils.getTickDuration(_this.wait),
+                                delta: Utils.getTickDuration(_this.wait, ticksPerBeat),
                                 velocity: _this.velocity,
                                 pitch: p,
                                 tick: _this.tick,
@@ -700,9 +705,10 @@ var MidiWriter = (function () {
                             noteOffNew = new NoteOffEvent({
                                 channel: _this.channel,
                                 duration: _this.duration,
+                                delta: Utils.getTickDuration(_this.duration, ticksPerBeat),
                                 velocity: _this.velocity,
                                 pitch: p,
-                                tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
+                                tick: _this.tick !== null ? Utils.getTickDuration(_this.duration, ticksPerBeat) + _this.tick : null,
                             });
                         }
                         else {
@@ -711,9 +717,10 @@ var MidiWriter = (function () {
                             noteOffNew = new NoteOffEvent({
                                 channel: _this.channel,
                                 duration: 0,
+                                delta: 0,
                                 velocity: _this.velocity,
                                 pitch: p,
-                                tick: _this.tick !== null ? Utils.getTickDuration(_this.duration) + _this.tick : null,
+                                tick: _this.tick !== null ? Utils.getTickDuration(_this.duration, ticksPerBeat) + _this.tick : null,
                             });
                         }
                         _this.events.push(noteOffNew);
@@ -727,7 +734,7 @@ var MidiWriter = (function () {
                         var noteOnNew = new NoteOnEvent({
                             channel: _this.channel,
                             wait: (i > 0 ? 0 : _this.wait),
-                            delta: (i > 0 ? 0 : Utils.getTickDuration(_this.wait)),
+                            delta: (i > 0 ? 0 : Utils.getTickDuration(_this.wait, ticksPerBeat)),
                             velocity: _this.velocity,
                             pitch: p,
                             tick: _this.tick,
@@ -735,6 +742,7 @@ var MidiWriter = (function () {
                         var noteOffNew = new NoteOffEvent({
                             channel: _this.channel,
                             duration: _this.duration,
+                            delta: Utils.getTickDuration(_this.duration, ticksPerBeat),
                             velocity: _this.velocity,
                             pitch: p,
                         });
@@ -909,8 +917,9 @@ var MidiWriter = (function () {
                         _this.explicitTickEvents.push(event);
                     }
                     else {
-                        // Push each on/off event to track's event stack
-                        event.buildData().events.forEach(function (e) { return _this.events.push(e); });
+                        // Defer building until buildData() when we have Writer options (ticksPerBeat).
+                        // Push the NoteEvent itself as a placeholder to preserve ordering.
+                        _this.events.push(event);
                     }
                 }
                 else {
@@ -931,6 +940,17 @@ var MidiWriter = (function () {
             this.data = [];
             this.size = [];
             this.tickPointer = 0;
+            // Expand any deferred NoteEvent placeholders in-place, preserving order
+            var expandedEvents = [];
+            this.events.forEach(function (event) {
+                if (event instanceof NoteEvent && event.tick === null) {
+                    event.buildData(options).events.forEach(function (e) { return expandedEvents.push(e); });
+                }
+                else {
+                    expandedEvents.push(event);
+                }
+            });
+            this.events = expandedEvents;
             var precisionLoss = 0;
             this.events.forEach(function (event) {
                 // Build event & add to total tick duration
@@ -945,10 +965,11 @@ var MidiWriter = (function () {
                     _this.data = _this.data.concat(event.data);
                 }
                 else {
+                    event.tick = _this.tickPointer;
                     _this.data = _this.data.concat(event.data);
                 }
             });
-            this.mergeExplicitTickEvents();
+            this.mergeExplicitTickEvents(options);
             // If the last event isn't EndTrackEvent, then tack it onto the data.
             if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
                 this.data = this.data.concat((new EndTrackEvent).data);
@@ -956,8 +977,9 @@ var MidiWriter = (function () {
             this.size = Utils.numberToBytes(this.data.length, 4); // 4 bytes long
             return this;
         };
-        Track.prototype.mergeExplicitTickEvents = function () {
+        Track.prototype.mergeExplicitTickEvents = function (options) {
             var _this = this;
+            if (options === void 0) { options = {}; }
             if (!this.explicitTickEvents.length)
                 return;
             // First sort asc list of events by startTick
@@ -969,13 +991,13 @@ var MidiWriter = (function () {
                 // Convert NoteEvent to it's respective NoteOn/NoteOff events
                 // Note that as we splice in events the delta for the NoteOff ones will
                 // Need to change based on what comes before them after the splice.
-                noteEvent.buildData().events.forEach(function (e) { return e.buildData(_this); });
+                noteEvent.buildData(options).events.forEach(function (e) { return e.buildData(_this, 0, options); });
                 // Merge each event individually into this track's event list.
                 noteEvent.events.forEach(function (event) { return _this.mergeSingleEvent(event); });
             });
             // Hacky way to rebuild track with newly spliced events.  Need better solution.
             this.explicitTickEvents = [];
-            this.buildData();
+            this.buildData(options);
         };
         /**
          * Merges another track's events with this track.
@@ -1008,16 +1030,27 @@ var MidiWriter = (function () {
                     break;
                 lastEventIndex = i;
             }
-            var splicedEventIndex = lastEventIndex + 1;
-            // Need to adjust the delta of this event to ensure it falls on the correct tick.
-            event.delta = event.tick - this.events[lastEventIndex].tick;
-            // Splice this event at lastEventIndex + 1
-            this.events.splice(splicedEventIndex, 0, event);
-            // Now adjust delta of all following events
-            for (var i = splicedEventIndex + 1; i < this.events.length; i++) {
-                // Since each existing event should have a tick value at this point we just need to
-                // adjust delta to that the event still falls on the correct tick.
-                this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
+            if (lastEventIndex === undefined) {
+                // This event needs to be inserted before all existing events.
+                event.delta = event.tick;
+                this.events.splice(0, 0, event);
+                // Adjust delta of the event that now follows the inserted one.
+                if (this.events.length > 1) {
+                    this.events[1].delta = this.events[1].tick - event.tick;
+                }
+            }
+            else {
+                var splicedEventIndex = lastEventIndex + 1;
+                // Need to adjust the delta of this event to ensure it falls on the correct tick.
+                event.delta = event.tick - this.events[lastEventIndex].tick;
+                // Splice this event at lastEventIndex + 1
+                this.events.splice(splicedEventIndex, 0, event);
+                // Now adjust delta of all following events
+                for (var i = splicedEventIndex + 1; i < this.events.length; i++) {
+                    // Since each existing event should have a tick value at this point we just need to
+                    // adjust delta to that the event still falls on the correct tick.
+                    this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
+                }
             }
         };
         /**
@@ -1247,11 +1280,12 @@ var MidiWriter = (function () {
      * @return {Header}
      */
     var Header = /** @class */ (function () {
-        function Header(numberOfTracks) {
+        function Header(numberOfTracks, ticksPerBeat) {
+            if (ticksPerBeat === void 0) { ticksPerBeat = 128; }
             this.type = Constants.HEADER_CHUNK_TYPE;
             var trackType = numberOfTracks > 1 ? Constants.HEADER_CHUNK_FORMAT1 : Constants.HEADER_CHUNK_FORMAT0;
             this.data = trackType.concat(Utils.numberToBytes(numberOfTracks, 2), // two bytes long,
-            Constants.HEADER_CHUNK_DIVISION);
+            Utils.numberToBytes(ticksPerBeat, 2));
             this.size = [0, 0, 0, this.data.length];
         }
         return Header;
@@ -1260,7 +1294,7 @@ var MidiWriter = (function () {
     /**
      * Object that puts together tracks and provides methods for file output.
      * @param {array|Track} tracks - A single {Track} object or an array of {Track} objects.
-     * @param {object} options - {middleC: 'C4'}
+     * @param {object} options - {middleC: 'C4', ticksPerBeat: 128}
      * @return {Writer}
      */
     var Writer = /** @class */ (function () {
@@ -1271,13 +1305,14 @@ var MidiWriter = (function () {
             this.options = options;
         }
         /**
-         * Builds array of data from chunkschunks.
+         * Builds array of data from chunks.
          * @return {array}
          */
         Writer.prototype.buildData = function () {
             var _this = this;
             var data = [];
-            data.push(new Header(this.tracks.length));
+            var ticksPerBeat = this.options['ticksPerBeat'] || 128;
+            data.push(new Header(this.tracks.length, ticksPerBeat));
             // For each track add final end of track event and build data
             this.tracks.forEach(function (track) {
                 data.push(track.buildData(_this.options));
