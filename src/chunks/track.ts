@@ -228,12 +228,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	removeEventsByName(eventName: string): Track {
-		this.events.forEach((event, index) => {
-			if (event.name === eventName) {
-				this.events.splice(index, 1);
-			}
-		});
-
+		this.events = this.events.filter(event => event.name !== eventName);
 		return this;
 	}
 
