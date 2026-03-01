@@ -6,7 +6,7 @@ var MidiWriter = (function () {
      * @return {Constants}
      */
     var Constants = {
-        VERSION: '3.2.0',
+        VERSION: '3.2.1',
         HEADER_CHUNK_TYPE: [0x4d, 0x54, 0x68, 0x64],
         HEADER_CHUNK_LENGTH: [0x00, 0x00, 0x00, 0x06],
         HEADER_CHUNK_FORMAT0: [0x00, 0x00],
@@ -1024,7 +1024,7 @@ var MidiWriter = (function () {
             // There are no events yet, so just add it in.
             if (!this.events.length) {
                 this.addEvent(event);
-                return;
+                return this;
             }
             // Find index of existing event we need to follow with
             var lastEventIndex;
@@ -1055,6 +1055,7 @@ var MidiWriter = (function () {
                     this.events[i].delta = this.events[i].tick - this.events[i - 1].tick;
                 }
             }
+            return this;
         };
         /**
          * Removes all events matching specified type.
