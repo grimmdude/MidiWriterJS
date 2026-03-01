@@ -15,7 +15,7 @@
 	This is the main theme, the pubblication comes along with 12
 	variations, it´s a pretty good start for classical guitarists.
 **/
-import MidiWriter from 'midi-writer-js';
+const MidiWriter = require('midi-writer-js');
 
 const tracks = [];
 
@@ -81,4 +81,4 @@ tracks[2].addEvent(new MidiWriter.NoteEvent({wait: '4', pitch: ['A3'], duration:
 
 const writer = new MidiWriter.Writer(tracks);
 console.log(writer.dataUri());
-export default writer;
+module.exports = writer;

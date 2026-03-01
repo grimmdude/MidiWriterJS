@@ -1,4 +1,4 @@
-import MidiWriter from 'midi-writer-js';
+const MidiWriter = require('midi-writer-js');
 
 const track = new MidiWriter.Track();
 
@@ -17,4 +17,4 @@ track.addEvent([
 
 const writer = new MidiWriter.Writer(track);
 console.log(writer.dataUri());
-export default writer;
+module.exports = writer;
