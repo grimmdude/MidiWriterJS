@@ -40,7 +40,7 @@ class Writer {
 	 * @return {Uint8Array}
 	 */
 	buildFile(): Uint8Array {
-		let build = [];
+		const build = [];
 
 		// Data consists of chunks which consists of data
 		this.buildData().forEach((d) => build.push(...d.type, ...d.size, ...d.data));
