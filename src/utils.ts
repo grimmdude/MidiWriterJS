@@ -1,4 +1,3 @@
-import {Constants} from './constants';
 import {toMidi} from '@tonaljs/midi';
 
 /**
@@ -11,7 +10,7 @@ class Utils {
 	 * @return {string}
 	 */
 	static version(): string {
-		return Constants.VERSION;
+		return '3.1.1';
 	}
 
 	/**
@@ -162,13 +161,14 @@ class Utils {
 	 * Gets the total number of ticks of a specified duration.
 	 * Note: type=='note' defaults to quarter note, type==='rest' defaults to 0
 	 * @param {(string|array)} duration
+	 * @param {number} ticksPerBeat - Ticks per quarter note (PPQN). Defaults to 128.
 	 * @return {number}
 	 */
-	static getTickDuration(duration: (string | string[] | number)): number {
+	static getTickDuration(duration: (string | string[] | number), ticksPerBeat = 128): number {
 		if (Array.isArray(duration)) {
 			// Recursively execute this method for each item in the array and return the sum of tick durations.
 			return duration.map((value) => {
-				return Utils.getTickDuration(value);
+				return Utils.getTickDuration(value, ticksPerBeat);
 			}).reduce((a, b) => {
 				return a + b;
 			}, 0);
@@ -187,9 +187,7 @@ class Utils {
 			return ticks;
 		}
 
-		// Need to apply duration here.  Quarter note == Constants.HEADER_CHUNK_DIVISION
-		const quarterTicks = Utils.numberFromBytes(Constants.HEADER_CHUNK_DIVISION);
-		const tickDuration = quarterTicks * Utils.getDurationMultiplier(duration);
+		const tickDuration = ticksPerBeat * Utils.getDurationMultiplier(duration);
 		return Utils.getRoundedIfClose(tickDuration)
 	}
 

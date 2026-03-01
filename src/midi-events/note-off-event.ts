@@ -25,7 +25,7 @@ class NoteOffEvent implements MidiEvent {
 		this.velocity = fields.velocity || 50;
 		this.tick = fields.tick || null;
 		this.data = fields.data;
-		this.delta = fields.delta || Utils.getTickDuration(fields.duration);
+		this.delta = fields.delta !== undefined ? fields.delta : Utils.getTickDuration(fields.duration);
 		this.status = 0x80;
 	}
 
@@ -34,7 +34,7 @@ class NoteOffEvent implements MidiEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOffEvent}
 	 */
-	buildData(track, precisionDelta: number, options: {middleC?: string} = {}) {
+	buildData(track, precisionDelta: number, options: {middleC?: string, ticksPerBeat?: number} = {}) {
 		if (this.tick === null) {
 			this.tick = Utils.getRoundedIfClose(this.delta + track.tickPointer);
 		}

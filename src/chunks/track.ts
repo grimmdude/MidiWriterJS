@@ -26,7 +26,7 @@ import {Utils} from '../utils';
  */
 class Track implements Chunk {
 	data: number[];
-	events: AbstractEvent[];
+	events: (AbstractEvent|NoteEvent)[];
 	explicitTickEvents: NoteEvent[];
 	size: number[];
 	type: number[];
@@ -71,8 +71,9 @@ class Track implements Chunk {
 					this.explicitTickEvents.push(event);
 
 				} else {
-					// Push each on/off event to track's event stack
-					event.buildData().events.forEach((e) => this.events.push(e));
+					// Defer building until buildData() when we have Writer options (ticksPerBeat).
+					// Push the NoteEvent itself as a placeholder to preserve ordering.
+					this.events.push(event);
 				}
 
 			} else {
@@ -88,11 +89,22 @@ class Track implements Chunk {
 	 * @param {object} options
 	 * @return {Track}
 	 */
-	buildData(options = {}) {
+	buildData(options: {ticksPerBeat?: number, middleC?: string} = {}) {
 		// Reset
 		this.data = [];
 		this.size = [];
 		this.tickPointer = 0;
+
+		// Expand any deferred NoteEvent placeholders in-place, preserving order
+		const expandedEvents: AbstractEvent[] = [];
+		this.events.forEach((event) => {
+			if (event instanceof NoteEvent && event.tick === null) {
+				event.buildData(options).events.forEach((e) => expandedEvents.push(e));
+			} else {
+				expandedEvents.push(event);
+			}
+		});
+		this.events = expandedEvents;
 
 		let precisionLoss = 0;
 
@@ -114,7 +126,7 @@ class Track implements Chunk {
 			}
 		});
 
-		this.mergeExplicitTickEvents();
+		this.mergeExplicitTickEvents(options);
 
 		// If the last event isn't EndTrackEvent, then tack it onto the data.
 		if (!this.events.length || !(this.events[this.events.length - 1] instanceof EndTrackEvent)) {
@@ -125,7 +137,7 @@ class Track implements Chunk {
 		return this;
 	}
 
-	mergeExplicitTickEvents() {
+	mergeExplicitTickEvents(options: {ticksPerBeat?: number, middleC?: string} = {}) {
 		if (!this.explicitTickEvents.length) return;
 
 		// First sort asc list of events by startTick
@@ -138,7 +150,7 @@ class Track implements Chunk {
 			// Convert NoteEvent to it's respective NoteOn/NoteOff events
 			// Note that as we splice in events the delta for the NoteOff ones will
 			// Need to change based on what comes before them after the splice.
-			noteEvent.buildData().events.forEach((e) => e.buildData(this));
+			noteEvent.buildData(options).events.forEach((e) => e.buildData(this, 0, options));
 
 			// Merge each event individually into this track's event list.
 			noteEvent.events.forEach((event) => this.mergeSingleEvent(event));
@@ -146,7 +158,7 @@ class Track implements Chunk {
 
 		// Hacky way to rebuild track with newly spliced events.  Need better solution.
 		this.explicitTickEvents = [];
-		this.buildData();
+		this.buildData(options);
 	}
 
 	/**

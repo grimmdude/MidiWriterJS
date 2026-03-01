@@ -48,11 +48,15 @@ class NoteEvent implements AbstractEvent {
 
 	/**
 	 * Builds int array for this event.
+	 * @param {object} options - {ticksPerBeat: number}
 	 * @return {NoteEvent}
 	 */
-	buildData(): NoteEvent {
+	buildData(options: {ticksPerBeat?: number} = {}): NoteEvent {
 		// Reset data array
 		this.data = [];
+		this.events = [];
+
+		const ticksPerBeat = options.ticksPerBeat || 128;
 
 		// Apply grace note(s) and subtract ticks (currently 1 tick per grace note) from tickDuration so net value is the same
 		if (this.grace) {
@@ -80,7 +84,7 @@ class NoteEvent implements AbstractEvent {
 						noteOnNew = new NoteOnEvent({
 							channel: this.channel,
 							wait: this.wait,
-							delta: Utils.getTickDuration(this.wait),
+							delta: Utils.getTickDuration(this.wait, ticksPerBeat),
 							velocity: this.velocity,
 							pitch: p,
 							tick: this.tick,
@@ -111,9 +115,10 @@ class NoteEvent implements AbstractEvent {
 						noteOffNew = new NoteOffEvent({
 							channel: this.channel,
 							duration: this.duration,
+							delta: Utils.getTickDuration(this.duration, ticksPerBeat),
 							velocity: this.velocity,
 							pitch: p,
-							tick: this.tick !== null ? Utils.getTickDuration(this.duration) + this.tick : null,
+							tick: this.tick !== null ? Utils.getTickDuration(this.duration, ticksPerBeat) + this.tick : null,
 						});
 
 					} else {
@@ -122,9 +127,10 @@ class NoteEvent implements AbstractEvent {
 						noteOffNew = new NoteOffEvent({
 							channel: this.channel,
 							duration: 0,
+							delta: 0,
 							velocity: this.velocity,
 							pitch: p,
-							tick: this.tick !== null ? Utils.getTickDuration(this.duration) + this.tick : null,
+							tick: this.tick !== null ? Utils.getTickDuration(this.duration, ticksPerBeat) + this.tick : null,
 						});
 					}
 
@@ -139,7 +145,7 @@ class NoteEvent implements AbstractEvent {
 					const noteOnNew = new NoteOnEvent({
 						channel: this.channel,
 						wait: (i > 0 ? 0 : this.wait), // wait only applies to first note in repetition
-						delta: (i > 0 ? 0 : Utils.getTickDuration(this.wait)),
+						delta: (i > 0 ? 0 : Utils.getTickDuration(this.wait, ticksPerBeat)),
 						velocity: this.velocity,
 						pitch: p,
 						tick: this.tick,
@@ -148,6 +154,7 @@ class NoteEvent implements AbstractEvent {
 					const noteOffNew = new NoteOffEvent({
 						channel: this.channel,
 						duration: this.duration,
+						delta: Utils.getTickDuration(this.duration, ticksPerBeat),
 						velocity: this.velocity,
 						pitch: p,
 					});

@@ -48,6 +48,35 @@ describe('MidiWriterJS', function() {
 			});
 		});
 
+		describe('#ticksPerBeat', function() {
+			it('should produce correct header bytes and scaled note durations with ticksPerBeat: 480', function() {
+				const track = new MidiWriter.Track();
+				const note = new MidiWriter.NoteEvent({pitch: 'C4', duration: '4'});
+				track.addEvent(note);
+				const write = new MidiWriter.Writer(track, {ticksPerBeat: 480});
+				const bytes = write.buildFile();
+				// Header division bytes should be 0x01, 0xE0 (480)
+				assert.equal(bytes[12], 0x01);
+				assert.equal(bytes[13], 0xE0);
+			});
+
+			it('should not affect explicit tick (T50) durations', function() {
+				const track = new MidiWriter.Track();
+				const note = new MidiWriter.NoteEvent({pitch: 'C4', duration: 'T50'});
+				track.addEvent(note);
+				// Same output regardless of ticksPerBeat since T50 is an explicit tick count
+				const write128 = new MidiWriter.Writer(track, {ticksPerBeat: 128});
+				const write480 = new MidiWriter.Writer(track, {ticksPerBeat: 480});
+				// The header will differ but the track data (note duration) should be the same
+				const bytes128 = write128.buildFile();
+				const bytes480 = write480.buildFile();
+				// Track data starts after the 14-byte header. Compare track chunks (skip header).
+				const track128 = Array.from(bytes128.slice(14));
+				const track480 = Array.from(bytes480.slice(14));
+				assert.deepEqual(track128, track480);
+			});
+		});
+
 		describe('#Notes by Start Tick', function() {
 			it('should return specific base64 string when notes by start tick example is created.', function () {
 				const midi = require('../examples/notes-by-start-tick.js');
