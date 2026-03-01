@@ -6,7 +6,7 @@ var MidiWriter = (function () {
      * @return {Constants}
      */
     var Constants = {
-        VERSION: '3.1.1',
+        VERSION: '3.2.0',
         HEADER_CHUNK_TYPE: [0x4d, 0x54, 0x68, 0x64],
         HEADER_CHUNK_LENGTH: [0x00, 0x00, 0x00, 0x06],
         HEADER_CHUNK_FORMAT0: [0x00, 0x00],
@@ -133,7 +133,7 @@ var MidiWriter = (function () {
          * @return {string}
          */
         Utils.version = function () {
-            return '3.1.1';
+            return '3.2.0';
         };
         /**
          * Convert a string to an array of bytes
