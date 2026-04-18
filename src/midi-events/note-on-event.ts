@@ -25,7 +25,7 @@ class NoteOnEvent implements MidiEvent {
 		this.wait 		= fields.wait || 0;
 		this.velocity 	= fields.velocity || 50;
 
-		this.tick 		= fields.tick || null;
+		this.tick 		= fields.tick ?? null;
 		this.delta 		= null;
 		this.data 		= fields.data;
 		this.status = 0x90;
@@ -41,7 +41,7 @@ class NoteOnEvent implements MidiEvent {
 		const ticksPerBeat = options.ticksPerBeat || 128;
 
 		// Explicitly defined startTick event
-		if (this.tick) {
+		if (this.tick !== null) {
 			this.tick = Utils.getRoundedIfClose(this.tick);
 
 			// If this is the first event in the track then use event's starting tick as delta.
