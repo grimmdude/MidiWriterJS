@@ -23,7 +23,7 @@ class NoteOnEvent implements MidiEvent {
 		this.channel 	= fields.channel || 1;
 		this.pitch 		= fields.pitch;
 		this.wait 		= fields.wait || 0;
-		this.velocity 	= fields.velocity || 50;
+		this.velocity 	= fields.velocity ?? 50;
 
 		this.tick 		= fields.tick ?? null;
 		this.delta 		= null;
