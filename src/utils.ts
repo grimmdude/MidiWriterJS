@@ -14,11 +14,11 @@ class Utils {
 	}
 
 	/**
-	 * Convert a string to an array of bytes
+	 * Convert a string to an array of byte codes.
 	 * @param {string} string
 	 * @return {array}
 	 */
-	static stringToBytes(string: string): number[] {
+	static stringToByteCodes(string: string): number[] {
 		return string.split('').map(char => char.charCodeAt(0))
 	}
 
@@ -52,7 +52,7 @@ class Utils {
 	 * @param {number} ticks - Number of ticks to be translated
 	 * @return {array} - Bytes that form the MIDI time value
 	 */
-	static numberToVariableLength(ticks: number): number[] {
+	static ticksToVariableLength(ticks: number): number[] {
 		ticks = Math.round(ticks);
 		let buffer = ticks & 0x7F;
 
@@ -88,7 +88,7 @@ class Utils {
 	 * @param {array} bytes
 	 * @return {number}
 	 */
-	static numberFromBytes(bytes: number[]): number {
+	static bytesToInt(bytes: number[]): number {
 		let hex = '';
 		let stringResult;
 
@@ -110,7 +110,7 @@ class Utils {
 	 * @param {number} bytesNeeded
 	 * @return {array} - Array of bytes
 	 */
-	static numberToBytes(number: number, bytesNeeded: number): number[] {
+	static intToBytes(number: number, bytesNeeded: number): number[] {
 		bytesNeeded = bytesNeeded || 1;
 
 		let hexString = number.toString(16);
@@ -256,6 +256,12 @@ class Utils {
 		}
 		throw new Error(duration + ' is not a valid duration.');
 	}
+
+	// Backward-compatible aliases for renamed methods
+	static stringToBytes = Utils.stringToByteCodes;
+	static numberFromBytes = Utils.bytesToInt;
+	static numberToBytes = Utils.intToBytes;
+	static numberToVariableLength = Utils.ticksToVariableLength;
 }
 
 export {Utils};

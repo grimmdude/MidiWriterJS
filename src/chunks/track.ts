@@ -1,23 +1,27 @@
 import { AbstractEvent } from '../abstract-event';
 import {Chunk} from './chunk';
 import {Constants} from '../constants';
-import {ControllerChangeEvent} from '../midi-events/controller-change-event';
-import {CopyrightEvent} from '../meta-events/copyright-event';
-import {CuePointEvent} from '../meta-events/cue-point-event';
 import {EndTrackEvent} from '../meta-events/end-track-event';
-import {InstrumentNameEvent} from '../meta-events/instrument-name-event';
-import {KeySignatureEvent} from '../meta-events/key-signature-event';
-import {LyricEvent} from '../meta-events/lyric-event';
-import {MarkerEvent} from '../meta-events/marker-event';
 import {NoteEvent} from '../midi-events/note-event';
 import {NoteOnEvent} from '../midi-events/note-on-event';
 import {NoteOffEvent} from '../midi-events/note-off-event';
-import {PitchBendEvent} from '../midi-events/pitch-bend-event';
 import {TempoEvent} from '../meta-events/tempo-event';
-import {TextEvent} from '../meta-events/text-event';
-import {TimeSignatureEvent} from '../meta-events/time-signature-event';
-import {TrackNameEvent} from '../meta-events/track-name-event';
 import {Utils} from '../utils';
+import {
+	createTempoEvent,
+	createTimeSignatureEvent,
+	createKeySignatureEvent,
+	createTextEvent,
+	createCopyrightEvent,
+	createTrackNameEvent,
+	createInstrumentNameEvent,
+	createMarkerEvent,
+	createCuePointEvent,
+	createLyricEvent,
+	createPolyModeOnEvent,
+	createPitchBendEvent,
+	createControllerChangeEvent
+} from './track-meta-methods';
 
 /**
  * Holds all data for a track.
@@ -241,7 +245,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	setTempo(bpm: number, tick = 0): Track {
-		return this.addEvent(new TempoEvent({bpm, tick}));
+		return this.addEvent(createTempoEvent(bpm, tick));
 	}
 
 	/**
@@ -253,7 +257,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	setTimeSignature(numerator: number, denominator: number, midiclockspertick: number, notespermidiclock: number): Track {
-		return this.addEvent(new TimeSignatureEvent(numerator, denominator, midiclockspertick, notespermidiclock));
+		return this.addEvent(createTimeSignatureEvent(numerator, denominator, midiclockspertick, notespermidiclock));
 	}
 
 	/**
@@ -263,7 +267,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	setKeySignature(sf, mi) {
-		return this.addEvent(new KeySignatureEvent(sf, mi));
+		return this.addEvent(createKeySignatureEvent(sf, mi));
 	}
 
 	/**
@@ -272,7 +276,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addText(text: string): Track {
-		return this.addEvent(new TextEvent({text}));
+		return this.addEvent(createTextEvent(text));
 	}
 
 	/**
@@ -281,7 +285,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addCopyright(text: string): Track {
-		return this.addEvent(new CopyrightEvent({text}));
+		return this.addEvent(createCopyrightEvent(text));
 	}
 
 	/**
@@ -290,7 +294,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addTrackName(text: string): Track {
-		return this.addEvent(new TrackNameEvent({text}));
+		return this.addEvent(createTrackNameEvent(text));
 	}
 
 	/**
@@ -299,7 +303,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addInstrumentName(text: string): Track {
-		return this.addEvent(new InstrumentNameEvent({text}));
+		return this.addEvent(createInstrumentNameEvent(text));
 	}
 
 	/**
@@ -308,7 +312,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addMarker(text: string): Track {
-		return this.addEvent(new MarkerEvent({text}));
+		return this.addEvent(createMarkerEvent(text));
 	}
 
 	/**
@@ -317,7 +321,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addCuePoint(text: string): Track {
-		return this.addEvent(new CuePointEvent({text}));
+		return this.addEvent(createCuePointEvent(text));
 	}
 
 	/**
@@ -326,7 +330,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	addLyric(text: string): Track {
-		return this.addEvent(new LyricEvent({text}));
+		return this.addEvent(createLyricEvent(text));
 	}
 
 	/**
@@ -334,8 +338,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	polyModeOn(): Track {
-		const event = new NoteOnEvent({data: [0x00, 0xB0, 0x7E, 0x00]});
-		return this.addEvent(event);
+		return this.addEvent(createPolyModeOnEvent());
 	}
 
 
@@ -345,7 +348,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	setPitchBend(bend: number): Track {
-		return this.addEvent(new PitchBendEvent({bend}));
+		return this.addEvent(createPitchBendEvent(bend));
 	}
 
 
@@ -358,7 +361,7 @@ class Track implements Chunk {
 	 * @return {Track}
 	 */
 	controllerChange(number: number, value: number, channel?: number, delta?: number): Track {
-		return this.addEvent(new ControllerChangeEvent({controllerNumber: number, controllerValue: value, channel: channel, delta: delta}));
+		return this.addEvent(createControllerChangeEvent(number, value, channel, delta));
 	}
 
 }
