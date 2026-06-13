@@ -1,34 +1,16 @@
-import {Constants} from '../constants';
-import {MetaEvent} from './meta-event';
-import {Utils} from '../utils';
+import {BaseTextEvent} from './base-text-event';
 
 /**
  * Object representation of a cue point meta event.
  * @param {object} fields {text: string, delta: integer}
  * @return {CuePointEvent}
  */
-class CuePointEvent implements MetaEvent {
-	data: number[];
-	delta: number;
-	name: string;
-	text: string;
+class CuePointEvent extends BaseTextEvent {
 	type: 0x07;
 
 	constructor(fields: { text: string; delta?: number; }) {
-		this.delta = fields.delta || 0x00;
-		this.name = 'CuePointEvent';
-		this.text = fields.text;
+		super({type: 0x07, name: 'CuePointEvent', text: fields.text, delta: fields.delta});
 		this.type = 0x07;
-
-		const textBytes = Utils.stringToBytes(this.text);
-
-		// Start with zero time delta
-		this.data = Utils.numberToVariableLength(this.delta).concat(
-			Constants.META_EVENT_ID,
-			this.type,
-			Utils.numberToVariableLength(textBytes.length), // Size
-			textBytes, // Text
-		);
 	}
 }
 
