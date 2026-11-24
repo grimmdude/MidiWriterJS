@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./build/index.js",
       "require": "./build/index.js"
     }
@@ -51,6 +52,7 @@
     "lint:js": "eslint 'src/**/**.ts'",
     "prepublishOnly": "npm test",
     "pretest": "npm run build",
+    "posttest": "tsc -p test/types",
     "test": "nyc --reporter=text mocha --no-config --no-package",
     "watch": "watch 'npm run build' src",
     "postinstall": "node postinstall.js"
